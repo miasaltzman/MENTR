@@ -13,7 +13,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:test": "bash scripts/db-test.sh",
-    "db:import-universities": "tsx scripts/import-universities.ts"
+    "db:import-universities": "tsx scripts/import-universities.ts",
+    "db:types": "DB_TYPES_OUT=src/types/database.ts bash scripts/db-test.sh && prettier --write src/types/database.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",
