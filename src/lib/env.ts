@@ -10,8 +10,7 @@ const serverSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
   AI_PROVIDER: z.enum(["anthropic", "mock"]).optional(),
   ANTHROPIC_API_KEY: z.string().min(1).optional(),
-  AI_MODEL: z.string().min(1).default("claude-sonnet-5"),
-  AI_MODEL_FAST: z.string().min(1).default("claude-haiku-4-5-20251001"),
+  AI_MODEL: z.string().min(1).default("claude-opus-5"),
   CRON_SECRET: z.string().min(16).optional(),
 });
 
