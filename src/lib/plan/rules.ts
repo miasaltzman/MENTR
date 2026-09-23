@@ -599,8 +599,15 @@ export function rulesWeeklyPriorities(
       x.horizon === "month" || x.horizon === "term" || x.horizon === "week",
   );
   const picks = near.slice(0, 3);
+  // Saved milestones are keyed by id; recover the rules key from the title.
+  const stepKeyByTitle = new Map(
+    rulesMilestones(ctx).map((r) => [r.title, r.key]),
+  );
   const priorities: PriorityDraft[] = picks.map((x) => ({
-    title: WEEKLY_STEPS[x.key] ?? `Take the next small step on “${x.title}”`,
+    title:
+      WEEKLY_STEPS[x.key] ??
+      WEEKLY_STEPS[stepKeyByTitle.get(x.title) ?? ""] ??
+      `Take the next small step on “${x.title}”`,
     why: x.why,
     category: x.category ?? "career_exploration",
     milestone_key: x.key,

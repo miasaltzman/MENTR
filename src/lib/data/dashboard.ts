@@ -83,7 +83,7 @@ export const loadHomeBasics = cache(async (userId: string) => {
         .maybeSingle(),
       supabase
         .from("notification_preferences")
-        .select("weekly_checkin")
+        .select("weekly_checkin, weekly_checkin_day")
         .eq("user_id", userId)
         .maybeSingle(),
     ]);
@@ -131,7 +131,9 @@ export const loadHomeBasics = cache(async (userId: string) => {
   };
 
   const hour = localHour(profile.timezone);
-  const isWeekend = [0, 6].includes(new Date(`${today}T12:00:00Z`).getUTCDay());
+  // ISO day of week in the user's timezone (1 = Monday ... 7 = Sunday).
+  const isoDow = new Date(`${today}T12:00:00Z`).getUTCDay() || 7;
+  const checkinDay = prefs.data?.weekly_checkin_day ?? 7;
   return {
     today,
     week,
@@ -148,10 +150,11 @@ export const loadHomeBasics = cache(async (userId: string) => {
           name: education.data.universities.name,
         }
       : null,
+    // Offered from the chosen day through the end of the week, until done.
     checkinDue:
       (prefs.data?.weekly_checkin ?? true) &&
       !checkin.data?.completed_at &&
-      (isWeekend || new Date(`${today}T12:00:00Z`).getUTCDay() === 5),
+      isoDow >= checkinDay,
   };
 });
 
