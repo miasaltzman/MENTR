@@ -96,12 +96,10 @@ async function main() {
   let done = 0;
   for (let i = 0; i < rows.length; i += 500) {
     const batch = rows.slice(i, i + 500);
-    const { error } = await supabase
-      .from("universities")
-      .upsert(batch, {
-        onConflict: "source,source_id",
-        ignoreDuplicates: false,
-      });
+    const { error } = await supabase.from("universities").upsert(batch, {
+      onConflict: "source,source_id",
+      ignoreDuplicates: false,
+    });
     if (error) throw new Error(`Upsert failed at row ${i}: ${error.message}`);
     done += batch.length;
     process.stdout.write(`\rUpserted ${done}/${rows.length}`);

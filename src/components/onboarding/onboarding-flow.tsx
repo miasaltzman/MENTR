@@ -35,15 +35,8 @@ export function initialCursor(answers: Answers): Cursor {
   const firstOpen = steps.find((s) => !(s.key in answers));
   // Everything answered but not yet finished: offer to build the plan.
   if (!firstOpen) return { type: "checkpoint" };
-  if (firstOpen.tier === "deepen") {
-    // Core is done. If they never started the deeper questions, offer the checkpoint.
-    const startedDeepen = steps.some(
-      (s) => s.tier === "deepen" && s.key in answers,
-    );
-    return startedDeepen
-      ? { type: "step", key: firstOpen.key }
-      : { type: "checkpoint" };
-  }
+  // Core is done: offer to build the plan (or keep going with optional questions).
+  if (firstOpen.tier === "deepen") return { type: "checkpoint" };
   return { type: "step", key: firstOpen.key };
 }
 
@@ -305,7 +298,9 @@ export function OnboardingFlow({
                 className="rounded-full px-6"
                 disabled={pending}
                 onClick={() => {
-                  const firstDeepen = steps.find((s) => s.tier === "deepen");
+                  const firstDeepen = steps.find(
+                    (s) => s.tier === "deepen" && !(s.key in answers),
+                  );
                   if (firstDeepen)
                     setCursor({ type: "step", key: firstDeepen.key });
                   else finish();
