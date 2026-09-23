@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { MentorContext } from "@/lib/ai/context";
 import { demoStudent, exploringAdult } from "../../../tests/fixtures/contexts";
-import { rulesDailyAction, rulesInitialPlan } from "./rules";
+import { roleNoun, rulesDailyAction, rulesInitialPlan } from "./rules";
 import { initialPlanDraft, isUsablePlan, sanitizePlan } from "./schemas";
 
 const founder: MentorContext = {
@@ -145,7 +145,7 @@ describe("rulesDailyAction", () => {
     }
   });
 
-  it("keeps actions small and meaningful", () => {
+  it("keeps actions small: usually 2–10 minutes, never more than 30", () => {
     for (const ctx of [
       demoStudent,
       exploringAdult,
@@ -154,8 +154,12 @@ describe("rulesDailyAction", () => {
       professional,
     ]) {
       const a = rulesDailyAction(ctx, { milestones: [] });
-      expect(a.estimated_minutes).toBeGreaterThanOrEqual(5);
-      expect(a.estimated_minutes).toBeLessThanOrEqual(45);
+      expect(a.estimated_minutes).toBeGreaterThanOrEqual(2);
+      expect(a.estimated_minutes).toBeLessThanOrEqual(10);
+      expect(
+        rulesDailyAction(ctx, { milestones: [], difficulty: "stretch" })
+          .estimated_minutes,
+      ).toBeLessThanOrEqual(30);
       expect(a.why.length).toBeGreaterThan(20);
     }
   });
@@ -188,7 +192,7 @@ describe("sanitizePlan", () => {
       ),
     ).toBe(true);
     expect(clean.weekly_priorities.length).toBeLessThanOrEqual(5);
-    expect(clean.today.estimated_minutes).toBe(60);
+    expect(clean.today.estimated_minutes).toBe(30);
   });
 });
 
@@ -216,5 +220,83 @@ describe("resizeRulesAction", () => {
         "lighter",
       ),
     ).toBeNull();
+  });
+});
+
+/** Every action any persona could get, at every size. */
+function everyAction(ctx: MentorContext) {
+  const out = [];
+  for (const difficulty of ["lighter", "standard", "stretch"] as const) {
+    const seen: string[] = [];
+    for (let i = 0; i < 40; i++) {
+      const a = rulesDailyAction(ctx, {
+        milestones: [],
+        difficulty,
+        avoidTitles: seen,
+        seed: `s${i}`,
+      });
+      if (seen.includes(a.title)) break;
+      seen.push(a.title);
+      out.push(a);
+    }
+  }
+  return out;
+}
+
+const HOMEWORK =
+  /\b(assignment|homework|exercise|worksheet|report|essay|reflection|reflect|teardown|one-page|write a|write down|write up|summari[sz]e|500 words)\b/i;
+
+describe("no homework feel", () => {
+  it.each([
+    ["student", demoStudent],
+    ["explorer", exploringAdult],
+    ["founder", founder],
+    ["founder without idea", founderNoIdea],
+    ["professional", professional],
+  ])("%s actions are quick wins, not assignments", (_n, ctx) => {
+    const actions = everyAction(ctx);
+    expect(actions.length).toBeGreaterThan(3);
+    for (const a of actions) {
+      expect(`${a.title} ${a.description} ${a.why}`).not.toMatch(HOMEWORK);
+      expect(a.estimated_minutes).toBeLessThanOrEqual(20);
+    }
+  });
+
+  it("plans, milestones, and weekly priorities avoid homework language too", () => {
+    for (const ctx of [
+      demoStudent,
+      exploringAdult,
+      founder,
+      founderNoIdea,
+      professional,
+    ]) {
+      const plan = rulesInitialPlan(ctx);
+      const text = [
+        plan.summary,
+        ...plan.milestones.flatMap((m) => [m.title, m.description, m.why]),
+        ...plan.weekly_priorities.flatMap((p) => [p.title, p.why]),
+      ].join(" \n ");
+      expect(text).not.toMatch(HOMEWORK);
+    }
+  });
+
+  it("offers the demo student light, concrete steps", () => {
+    const titles = everyAction(demoStudent).map((a) => a.title);
+    expect(titles).toContain(
+      "Find one AI company you’d be excited to intern at",
+    );
+    expect(titles).toContain("Follow one AI Product Manager on LinkedIn");
+  });
+});
+
+describe("roleNoun", () => {
+  it.each([
+    ["AI Product Management", "AI Product Manager"],
+    ["Software Engineering", "Software Engineer"],
+    ["UX / Product Design", "UX / Product Designer"],
+    ["Data Science & Analytics", "Data Scientist"],
+    ["Healthcare", "person working in Healthcare"],
+  ])("%s → %s", (field, noun) => {
+    expect(roleNoun(field)).toBe(noun);
   });
 });

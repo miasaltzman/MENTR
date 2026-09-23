@@ -51,7 +51,7 @@ function MentorBubble({
     <div className="flex gap-3">
       <LogoMark className="mt-0.5 size-8" />
       <div className="min-w-0 flex-1">
-        <p className="text-xl leading-snug font-semibold text-balance sm:text-2xl">
+        <p className="text-display text-[2rem] text-balance sm:text-[2.5rem]">
           {children}
         </p>
         {helper ? (
@@ -278,7 +278,7 @@ export function OnboardingFlow({
 
         {cursor.type === "checkpoint" && !finishing ? (
           <div className="animate-in space-y-6 duration-300 fade-in slide-in-from-bottom-2">
-            <MentorBubble helper="A few more questions (about 2 minutes) will make my recommendations sharper — like where you want to live, what matters most to you, and skills you want to build. You can also answer them later.">
+            <MentorBubble helper="A few more quick questions would sharpen my suggestions. Totally optional.">
               {firstName ? `Thanks, ${firstName}. ` : "Thanks. "}That’s enough
               for me to build your first plan.
             </MentorBubble>
@@ -318,7 +318,7 @@ export function OnboardingFlow({
             role="status"
             aria-live="polite"
           >
-            <MentorBubble helper="I’m mapping out where you are, where you want to go, and a first small step for today. This can take a moment.">
+            <MentorBubble helper="Finding your first step.">
               Building your plan…
             </MentorBubble>
             <div className="flex items-center gap-2 text-sm text-muted-foreground sm:pl-11">

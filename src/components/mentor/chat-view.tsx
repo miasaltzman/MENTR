@@ -51,7 +51,7 @@ function SuggestionCard({
     : `Make this today’s 1%${suggestion.estimated_minutes ? ` · ~${suggestion.estimated_minutes} min` : ""}`;
 
   return (
-    <div className="rounded-xl border bg-card p-3.5">
+    <div className="rounded-2xl bg-muted/60 p-4">
       <div className="flex items-start gap-3">
         <Icon className="mt-0.5 size-4 shrink-0 text-primary" />
         <div className="min-w-0 flex-1">
@@ -216,12 +216,12 @@ export function ChatView({
         {messages.length === 0 ? (
           <div className="pt-6">
             <LogoMark className="size-10" />
-            <h1 className="mt-4 text-2xl font-semibold sm:text-3xl">
+            <h1 className="text-display mt-6 text-[2.5rem] sm:text-5xl">
               What’s on your mind{firstName ? `, ${firstName}` : ""}?
             </h1>
             <p className="mt-2 text-muted-foreground">
-              Ask about careers, skills, decisions, or what to do next. I know
-              your goals and plan, so you don’t need to explain from scratch.
+              Careers, skills, decisions, what to do next. I already know your
+              goals.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {starterPrompts.map((p) => (
@@ -229,7 +229,7 @@ export function ChatView({
                   key={p}
                   type="button"
                   onClick={() => send(p)}
-                  className="rounded-full border bg-card px-3.5 py-2 text-left text-sm transition-colors hover:border-primary/40 hover:bg-accent/40"
+                  className="rounded-full bg-muted px-4 py-2 text-left text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
                 >
                   {p}
                 </button>
@@ -300,7 +300,7 @@ export function ChatView({
       </div>
 
       <form
-        className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] rounded-2xl border bg-card p-2 shadow-sm md:bottom-4"
+        className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] rounded-3xl bg-card p-2 shadow-[0_1px_2px_oklch(0.2_0.01_70/0.06),0_12px_32px_-16px_oklch(0.2_0.01_70/0.18)] md:bottom-4"
         onSubmit={(e) => {
           e.preventDefault();
           void send(input);

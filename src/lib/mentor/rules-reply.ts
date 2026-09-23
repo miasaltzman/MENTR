@@ -1,15 +1,48 @@
 import type { MentorContext } from "@/lib/ai/context";
-import { isExploring, segmentOf, targetOf } from "@/lib/plan/rules";
+import { isExploring, roleNoun, segmentOf, targetOf } from "@/lib/plan/rules";
 import type { Suggestions } from "./schemas";
 
 /**
- * Deterministic mentor replies for demo mode and model outages. They use the
- * user's own context, recognise common questions, and never invent facts.
+ * Deterministic mentor replies for demo mode and model outages. Short,
+ * personal, "here’s what I’d do next" — built from the user's own context,
+ * never inventing facts, and never handing out homework.
  */
 type Reply = { text: string; suggestions: Suggestions | null };
 
 const has = (msg: string, ...words: string[]) =>
   words.some((w) => msg.includes(w));
+
+function today(
+  title: string,
+  why: string,
+  category: NonNullable<Suggestions["items"][number]["category"]>,
+  minutes: number,
+) {
+  return {
+    kind: "set_today" as const,
+    title,
+    why,
+    horizon: null,
+    category,
+    estimated_minutes: minutes,
+  };
+}
+
+function milestone(
+  title: string,
+  why: string,
+  horizon: "year" | "term" | "month",
+  category: NonNullable<Suggestions["items"][number]["category"]>,
+) {
+  return {
+    kind: "add_milestone" as const,
+    title,
+    why,
+    horizon,
+    category,
+    estimated_minutes: null,
+  };
+}
 
 export function rulesMentorReply(ctx: MentorContext, message: string): Reply {
   const msg = message.toLowerCase();
@@ -23,17 +56,15 @@ export function rulesMentorReply(ctx: MentorContext, message: string): Reply {
 
   if (has(msg, "behind", "overwhelm", "stressed", "anxious", "lost")) {
     return {
-      text: `${name}feeling behind is really common — and usually a sign you care, not that you’re failing. Most people who look “ahead” just started one small thing earlier.\n\nHere’s what I’d do:\n- Pick **one** thing that matters most this week${focus ? ` (I’d suggest: ${focus.title.toLowerCase()})` : ""}.\n- Do one 15-minute step on it today.\n- Ignore the rest for now — it’ll still be there next week.\n\nWhat feels most urgent to you right now?`,
+      text: `${name}that feeling is really common — and it usually means you care. Most people who look “ahead” just started one small thing earlier.\n\nHere’s what I’d do: pick **one** thing that matters this week${focus ? ` (I’d go with ${focus.title.toLowerCase()})` : ""}, take one tiny step on it today, and let the rest wait.\n\nWhat feels most urgent right now?`,
       suggestions: {
         items: [
-          {
-            kind: "set_today",
-            title: "Write down the one thing that matters most this week",
-            why: "Narrowing to one priority turns a vague feeling of being behind into a concrete next step.",
-            horizon: null,
-            category: "career_exploration",
-            estimated_minutes: 10,
-          },
+          today(
+            "Pick the one thing that matters most this week",
+            "One clear priority turns a vague feeling into a next step.",
+            "career_exploration",
+            2,
+          ),
         ],
       },
     };
@@ -52,17 +83,23 @@ export function rulesMentorReply(ctx: MentorContext, message: string): Reply {
   ) {
     const interests = ctx.careerInterests.map((c) => c.label);
     return {
-      text: `${name}not knowing yet is a fine place to start. The trick is to explore with small experiments instead of trying to think your way to an answer.\n\nA simple approach:\n1. **Notice energy.** For a week, jot down moments you enjoyed or lost track of time.\n2. **Shortlist three roles**${interests.length ? ` — you mentioned ${interests.slice(0, 3).join(", ")}, which is a good start` : ""}.\n3. **Try a tiny version of each** — a short project, a conversation with someone in the role, or a free intro course.\n\nAfter a few weeks you’ll have evidence instead of guesses. Want me to add a “test three paths” milestone to your roadmap?`,
+      text: `${name}not knowing yet is a fine place to start. You don’t need to think your way to an answer — try small things and notice what pulls you in.\n\nHere’s what I’d do:\n- Pick three roles to look into${interests.length ? ` — ${interests.slice(0, 3).join(", ")} is a good start` : ""}.\n- Spend five minutes on a “day in the life” video for each.\n- Talk to one person doing the one that sounds best.\n\nWant to start with the first one today?`,
       suggestions: {
         items: [
-          {
-            kind: "add_milestone",
-            title: "Test three possible career paths with small experiments",
-            why: "Trying small versions of each path gives you real evidence about what fits.",
-            horizon: "term",
-            category: "career_exploration",
-            estimated_minutes: null,
-          },
+          today(
+            interests[0]
+              ? `Explore ${interests[0]} for 5 minutes`
+              : "Explore one career path for 5 minutes",
+            "Seeing a real day in a role tells you more than any quiz.",
+            "career_exploration",
+            5,
+          ),
+          milestone(
+            "Try three possible paths with small experiments",
+            "Small real-world tries give you evidence instead of guesses.",
+            "term",
+            "career_exploration",
+          ),
         ],
       },
     };
@@ -71,17 +108,21 @@ export function rulesMentorReply(ctx: MentorContext, message: string): Reply {
   if (has(msg, "summer")) {
     const role = target ?? "the field you’re exploring";
     return {
-      text: `${name}a good summer does one of three things: gets you **real experience**, builds **proof** (projects you can show), or grows your **network**. Ideally two.\n\nFor ${role}, in order of impact:\n- **An internship or research role** — apply early; many programs recruit months ahead.\n- **A substantial project** — something you can demo and explain in interviews.\n- **Structured learning + people** — a course plus a few conversations with people in ${role}.\n\nI can’t see live postings yet, so check ${school ? `${school}’s career portal` : "your career portal and job boards"} for current deadlines. Want me to add a summer milestone to your roadmap?`,
+      text: `${name}a good summer gets you **real experience**, something you can **show**, or **people** who know you. Ideally two of the three.\n\nFor ${role}, I’d aim for an internship or research role first — and start looking early, since many recruit months ahead. If that doesn’t land, a small project plus a few conversations with people in ${role} is a strong plan B.\n\nI can’t see live postings yet, so ${school ? `${school}’s career portal` : "your career portal and job boards"} are the place to check.`,
       suggestions: {
         items: [
-          {
-            kind: "add_milestone",
-            title: `Line up a summer experience related to ${role}`,
-            why: "Summer is the easiest time to build experience that changes your next application.",
-            horizon: "term",
-            category: "applications",
-            estimated_minutes: null,
-          },
+          today(
+            "Save one internship you’d actually apply to",
+            "Real postings show you what employers want — and when deadlines hit.",
+            "applications",
+            5,
+          ),
+          milestone(
+            `Line up a summer experience in ${role}`,
+            "Summer is the easiest time to build experience that changes your next application.",
+            "term",
+            "applications",
+          ),
         ],
       },
     };
@@ -89,27 +130,22 @@ export function rulesMentorReply(ctx: MentorContext, message: string): Reply {
 
   if (has(msg, "project")) {
     const role = target ?? "your area of interest";
-    const skill = ctx.preferences?.skillsToLearn[0];
     return {
-      text: `${name}here’s a project shape that works well for ${role}:\n\n**Pick a real problem you’ve seen up close** — at school, work, or in a community you’re part of. Then:\n1. Write a one-page brief: who has the problem, how they handle it today, what “better” looks like.\n2. Build the smallest version that helps${skill ? ` (a good chance to practice ${skill})` : ""}.\n3. Show it to three people and write down what they say.\n4. Write a short case study: problem, approach, what you learned, what you’d do next.\n\nThat case study is the part employers remember. Want to start today?`,
+      text: `${name}here’s what I’d do: pick a real problem you’ve seen up close — at school, at work, or somewhere you spend time — and build the smallest thing that helps.\n\n1. Choose the problem.\n2. Build a tiny first version.\n3. Show it to three people.\n4. Share what you learned in a short post.\n\nThat last step is what people in ${role} will remember. Start with step one today?`,
       suggestions: {
         items: [
-          {
-            kind: "set_today",
-            title: "Write a one-page brief for a small project",
-            why: `A clear brief makes the project finishable — and becomes the start of your case study for ${role}.`,
-            horizon: null,
-            category: "experience",
-            estimated_minutes: 25,
-          },
-          {
-            kind: "add_milestone",
-            title: "Finish one project and write a case study",
-            why: "A finished project with a write-up is strong evidence of what you can do.",
-            horizon: "term",
-            category: "experience",
-            estimated_minutes: null,
-          },
+          today(
+            "Choose which project idea you want to build",
+            `Deciding is the hardest part — once you pick, the next steps are small.`,
+            "experience",
+            5,
+          ),
+          milestone(
+            "Finish one small project you can show people",
+            "Something real you built is the strongest proof of what you can do.",
+            "term",
+            "experience",
+          ),
         ],
       },
     };
@@ -126,17 +162,15 @@ export function rulesMentorReply(ctx: MentorContext, message: string): Reply {
     )
   ) {
     return {
-      text: `${name}a little preparation makes these conversations much easier.\n\n**Before:** have a 20-second intro — who you are, what you’re interested in${target ? ` (${target})` : ""}, and one thing you’ve done that shows it.\n\n**Good questions to ask:**\n- What does a typical week look like for someone early in this role?\n- What distinguishes the strongest interns or new hires you’ve seen?\n- What do you wish you’d known when you started?\n\n**After:** send a short thank-you within a day that mentions something specific you talked about.\n\nWant me to make “draft your 20-second intro” today’s action?`,
+      text: `${name}a little prep goes a long way.\n\n**Have a 20-second intro:** who you are, what you’re interested in${target ? ` (${target})` : ""}, and one thing you’ve done that shows it.\n\n**Good questions:**\n- What does a typical week look like early in this role?\n- What makes a new hire stand out?\n- What do you wish you’d known when you started?\n\nAfterward, a short thank-you within a day that mentions something specific.`,
       suggestions: {
         items: [
-          {
-            kind: "set_today",
-            title: "Draft your 20-second introduction",
-            why: "A crisp intro makes every networking conversation easier to start.",
-            horizon: null,
-            category: "networking",
-            estimated_minutes: 10,
-          },
+          today(
+            "Say your 20-second intro out loud once",
+            "Saying it once makes it easy when it counts.",
+            "networking",
+            3,
+          ),
         ],
       },
     };
@@ -149,33 +183,35 @@ export function rulesMentorReply(ctx: MentorContext, message: string): Reply {
     const idea = ctx.venture?.ideaSummary;
     if (!idea || isExploring(ctx)) {
       return {
-        text: `${name}the best business ideas usually come from problems you see up close, not from brainstorming. Start a **problem journal**: for a week, write down frustrations you notice — yours and other people’s — and how often they happen.\n\nThen look for overlap with what you’re good at. A problem that’s frequent, painful, and close to your skills is worth testing.\n\nWant to make the problem journal today’s action?`,
+        text: `${name}the best ideas usually start as everyday annoyances, not brainstorms. For the next week, just notice what frustrates you and the people around you — and how often.\n\nThen look for overlap with what you’re good at. A problem that’s frequent, painful, and close to your skills is worth testing.`,
         suggestions: {
           items: [
-            {
-              kind: "set_today",
-              title: "Write down three frustrations you noticed today",
-              why: "Real, frequent problems are where good business ideas come from.",
-              horizon: null,
-              category: "business",
-              estimated_minutes: 10,
-            },
+            today(
+              "Notice one everyday frustration today",
+              "Real, frequent problems are where good ideas come from.",
+              "business",
+              2,
+            ),
           ],
         },
       };
     }
     return {
-      text: `${name}for “${idea}”, the next most valuable thing is evidence that people want it before you spend much money.\n\n1. **Talk to five potential customers** about the problem (not your solution).\n2. **Estimate unit costs** — materials, packaging, time, fees — so you know your margin at a few price points.\n3. **Run one cheap test**: pre-orders, a small batch, or a pop-up.\n\nFor anything regulatory — permits, licenses, food rules — rely on your city or county’s official guidance; rules vary a lot by location.`,
+      text: `${name}for “${idea}”, the most valuable thing right now is evidence that people want it — before you spend much money.\n\nHere’s what I’d do next:\n- Talk to a few potential customers about the problem (not your idea).\n- Look up what similar things sell for.\n- Run one cheap test, like pre-orders or a small batch.\n\nFor permits or regulations, rely on your city or county’s official guidance — rules vary a lot by place.`,
       suggestions: {
         items: [
-          {
-            kind: "add_milestone",
-            title: "Have five customer conversations",
-            why: "Customer conversations are the cheapest way to validate the idea.",
-            horizon: "month",
-            category: "business",
-            estimated_minutes: null,
-          },
+          today(
+            "Name three people who have the problem you’re solving",
+            "Customer conversations are the cheapest way to validate an idea.",
+            "business",
+            5,
+          ),
+          milestone(
+            "Have five customer conversations",
+            "Five real conversations tell you more than months of planning.",
+            "month",
+            "business",
+          ),
         ],
       },
     };
@@ -183,16 +219,27 @@ export function rulesMentorReply(ctx: MentorContext, message: string): Reply {
 
   if (has(msg, "this week", "today", "what should i do", "next step")) {
     return {
-      text: `${name}here’s where I’d focus${focus ? `: **${focus.title}**` : ""}.\n\nKeep it small — one meaningful step a day beats a big push once a week. Your 1% action on the home screen is picked to move this forward, and your weekly priorities break it into chunks.\n\nIf something’s making this week harder than usual, tell me and we’ll adjust.`,
+      text: `${name}here’s where I’d focus${focus ? `: **${focus.title}**` : ""}.\n\nOne small step a day beats a big push once a week. Your 1% on the home screen is picked to move this forward — start there.\n\nIf something’s making this week harder than usual, tell me and we’ll adjust.`,
       suggestions: null,
     };
   }
 
   const direction = target
     ? `toward ${target}`
-    : "toward a direction you’re excited about";
+    : "toward something you’re excited about";
   return {
-    text: `${name}good question. I want to give you advice that fits your situation, so a quick check: what outcome are you hoping for here — a decision, a plan, or just a sounding board?\n\nIn the meantime, the principle I’d apply: favor small actions that build real evidence ${direction} — projects, conversations, and applications — over more research.`,
-    suggestions: null,
+    text: `${name}good question. Quick check so I give you something useful: are you after a decision, a plan, or just a sounding board?\n\nMeanwhile, my rule of thumb: small moves that build real evidence ${direction} — people, projects, applications — beat more research.`,
+    suggestions: target
+      ? {
+          items: [
+            today(
+              `Follow one ${roleNoun(target)} on LinkedIn`,
+              "Seeing what people in your target role talk about helps you understand the job.",
+              "networking",
+              3,
+            ),
+          ],
+        }
+      : null,
   };
 }

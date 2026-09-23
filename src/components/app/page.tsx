@@ -10,7 +10,7 @@ export function PageContainer({
   return (
     <div
       className={cn(
-        "mx-auto w-full max-w-3xl px-5 pt-8 sm:px-8 sm:pt-12",
+        "mx-auto w-full max-w-2xl animate-in px-6 pt-10 duration-300 fade-in sm:px-8 sm:pt-16",
         className,
       )}
     >
@@ -29,11 +29,11 @@ export function PageHeader({
   actions?: React.ReactNode;
 }) {
   return (
-    <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
+    <header className="mb-10 flex flex-wrap items-end justify-between gap-4">
       <div className="min-w-0">
-        <h1 className="text-3xl font-semibold">{title}</h1>
+        <h1 className="text-display text-[2.75rem] sm:text-5xl">{title}</h1>
         {description ? (
-          <p className="mt-2 text-pretty text-muted-foreground">
+          <p className="mt-3 text-pretty text-muted-foreground">
             {description}
           </p>
         ) : null}
@@ -55,11 +55,9 @@ export function Section({
   className?: string;
 }) {
   return (
-    <section className={cn("mt-10", className)}>
-      <div className="mb-3 flex items-center justify-between gap-4">
-        <h2 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
-          {title}
-        </h2>
+    <section className={cn("mt-14", className)}>
+      <div className="mb-4 flex items-baseline justify-between gap-4">
+        <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
         {action}
       </div>
       {children}

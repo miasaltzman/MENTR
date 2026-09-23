@@ -6,7 +6,7 @@ export const suggestionItem = z.object({
   kind: z
     .enum(["add_milestone", "set_today"])
     .describe(
-      "add_milestone: a goal for the roadmap. set_today: a 5-30 minute action to do today.",
+      "add_milestone: a goal for the roadmap. set_today: a 2-10 minute quick win to do today (never a writing assignment).",
     ),
   title: z.string().describe("Short, action-oriented"),
   why: z.string().describe("One sentence on why it matters for this user"),
@@ -42,7 +42,7 @@ export function sanitizeSuggestions(s: Suggestions | null): StoredSuggestion[] {
       horizon: i.kind === "add_milestone" ? (i.horizon ?? "month") : null,
       estimated_minutes:
         i.kind === "set_today"
-          ? Math.min(60, Math.max(5, Math.round(i.estimated_minutes ?? 15)))
+          ? Math.min(30, Math.max(2, Math.round(i.estimated_minutes ?? 5)))
           : null,
       accepted_at: null,
     }));

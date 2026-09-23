@@ -132,7 +132,7 @@ function explorerMilestones(ctx: MentorContext): MilestoneDraft[] {
       "energy-audit",
       "month",
       "Notice what energizes you",
-      "Keep a simple log of moments you enjoyed or lost track of time, and what they had in common.",
+      "Pay attention to moments you enjoy or lose track of time — and what they have in common.",
       "Your own patterns are the best clue to work that will suit you.",
       "career_exploration",
       "shortlist",
@@ -364,7 +364,7 @@ function professionalMilestones(
     m(
       "story",
       "term",
-      "Write your transition story",
+      "Get clear on your “why this switch” story",
       "Two or three sentences that connect your past experience to where you’re headed.",
       "A crisp story makes networking and interviews dramatically easier.",
       "career_exploration",
@@ -391,7 +391,7 @@ function professionalMilestones(
     m(
       "wins",
       "month",
-      "Document your wins with numbers",
+      "Know your best wins, with numbers",
       "Five accomplishments from the past year with measurable results.",
       "Quantified wins are the raw material for your resume and interviews.",
       "experience",
@@ -529,9 +529,9 @@ function founderExplorerMilestones(): MilestoneDraft[] {
     m(
       "problem-journal",
       "month",
-      "Keep a problem journal",
-      "Write down frustrations you notice — yours and other people’s.",
-      "Ideas hide in everyday annoyances. A journal makes them visible.",
+      "Collect problems worth solving",
+      "Notice everyday frustrations — yours and other people’s.",
+      "Ideas hide in everyday annoyances. Noticing them is the first step.",
       "business",
       "problem-bank",
     ),
@@ -562,32 +562,31 @@ export function rulesMilestones(ctx: MentorContext): MilestoneDraft[] {
 
 /** Week-sized first steps for rules-based milestones, keyed by milestone key. */
 const WEEKLY_STEPS: Record<string, string> = {
-  "campus-org": "Shortlist two campus organizations and attend one meeting",
-  "network-3": "Reach out to one person working in your target field",
-  "first-project": "Pick a first project and write a one-page plan",
-  resume: "Update your resume with your strongest project",
-  "target-list": "Save five internships to your target list",
-  "learn-skill": "Do two short learning sessions",
-  shortlist: "Read about two roles you’re curious about",
-  conversations: "Reach out to one person doing work you’re curious about",
-  "energy-audit": "Start a simple log of what energizes you",
-  "first-experiment": "Choose one small experiment to try",
-  story: "Draft your two-sentence transition story",
-  network: "Reach out to one person in your target role",
-  requirements: "Review three real job postings for your target role",
-  wins: "Write down three wins with numbers",
-  customer: "Write your one-sentence problem statement",
-  competitors: "List three alternatives your customers use today",
-  test: "Decide on one cheap test you could run",
-  costs: "List every cost that goes into one unit",
-  rules: "Find your local official small-business guidance",
-  strengths: "List your top skills and problems they could solve",
-  "problem-journal": "Write down three frustrations you notice this week",
+  "campus-org": "Find one campus organization to try",
+  "network-3": "Message one person working in your target field",
+  "first-project": "Choose which project idea you want to build",
+  resume: "Improve one resume bullet",
+  "target-list": "Save two internships worth applying to",
+  "learn-skill": "Try two short learning sessions",
+  shortlist: "Look into two roles you’re curious about",
+  conversations: "Message one person doing work you’re curious about",
+  "energy-audit": "Notice what you enjoy this week",
+  "first-experiment": "Pick one small thing to try",
+  story: "Get your “why this switch” answer down to one sentence",
+  network: "Message one person in your target role",
+  requirements: "Look at three real job postings",
+  wins: "Remember one win from this quarter",
+  customer: "Say who has the problem, in one sentence",
+  competitors: "Find one alternative customers use today",
+  test: "Pick one cheap way to test demand",
+  costs: "Look up what your materials cost",
+  rules: "Find your city’s official small-business page",
+  strengths: "Pick one skill people ask you for help with",
+  "problem-journal": "Notice three everyday frustrations",
   "talk-owners": "Ask one small-business owner how they started",
-  club: "Look through your school’s clubs and pick one to try",
-  "talk-to-someone":
-    "Think of one person in your field of interest you could talk to",
-  "skill-month": "Do two short learning sessions",
+  club: "Pick one club to try",
+  "talk-to-someone": "Think of one person in your field of interest to talk to",
+  "skill-month": "Try two short learning sessions",
 };
 
 export function rulesWeeklyPriorities(
@@ -613,13 +612,22 @@ export function rulesWeeklyPriorities(
     milestone_key: x.key,
   }));
   priorities.push({
-    title: "Do your 1% action on at least four days",
-    why: "Small, steady steps are what add up. Missing a day is fine — just pick it back up.",
+    title: "Take your 1% step on a few days this week",
+    why: "Small steps add up. Missing a day is fine.",
     category: "learning",
     milestone_key: null,
   });
   return priorities.slice(0, 5);
 }
+
+const FIRST_DAY = [
+  "dream-company",
+  "follow-person",
+  "explore-path",
+  "customers",
+  "notice-problem",
+  "ask-focus",
+];
 
 export function rulesInitialPlan(ctx: MentorContext): InitialPlanDraft {
   const milestones = rulesMilestones(ctx);
@@ -642,12 +650,14 @@ export function rulesInitialPlan(ctx: MentorContext): InitialPlanDraft {
     north_star,
     mode: exploring ? "exploring" : "directed",
     summary: exploring
-      ? "You don’t need to have it figured out. This plan starts by exploring deliberately — small experiments and real conversations — so your direction comes from evidence, not guesswork."
-      : `This plan works backward from ${lc(north_star)}. Each layer supports the one above it, and today’s step is always tied to something bigger.`,
+      ? "You don’t need it all figured out. We’ll start by exploring — small experiments and real conversations — and let your direction come from what you learn."
+      : `Working backward from: ${lc(north_star)}. Every small step ties to something bigger.`,
     milestones,
     weekly_priorities: rulesWeeklyPriorities(ctx, milestones),
     // Link today's action to the nearest-horizon milestone it advances.
     today: rulesDailyAction(ctx, {
+      // Day one should feel inviting: the lightest, most concrete steps.
+      preferIds: FIRST_DAY,
       milestones: [...milestones]
         .reverse()
         .map((x) => ({ ref: x.key, category: x.category })),
@@ -673,6 +683,7 @@ type Template = {
 
 const any = () => true;
 const college = (s: Segment) => s === "student" || s === "graduate";
+const student = (s: Segment) => s === "student" || s === "high_school";
 const careerSeekers = (s: Segment) => s !== "founder";
 const worker = (s: Segment) => s === "professional" || s === "changer";
 const founderWithIdea = (s: Segment, c: MentorContext) =>
@@ -686,532 +697,654 @@ const exploring = (s: Segment, c: MentorContext) =>
 const tgt = (c: MentorContext) =>
   targetOf(c) ?? "the field you’re curious about";
 
+const ROLE_SUFFIXES: [RegExp, string][] = [
+  [/management$/i, "Manager"],
+  [/engineering$/i, "Engineer"],
+  [/design$/i, "Designer"],
+  [/data science$/i, "Data Scientist"],
+  [/analytics$/i, "Analyst"],
+  [/consulting$/i, "Consultant"],
+  [/research$/i, "Researcher"],
+  [/marketing$/i, "Marketer"],
+  [/entrepreneurship$/i, "Founder"],
+];
+
+/**
+ * A person in the user's target field: "AI Product Management" becomes
+ * "AI Product Manager"; unknown fields become "person working in <field>".
+ */
+export function roleNoun(field: string | null): string {
+  if (!field) return "person working in a field you’re curious about";
+  const clean = field.replace(/\s*&.*$/, "").trim();
+  for (const [re, noun] of ROLE_SUFFIXES) {
+    if (re.test(clean)) return clean.replace(re, noun);
+  }
+  return `person working in ${field}`;
+}
+
+const industryOf = (c: MentorContext) =>
+  c.preferences?.industries[0] ??
+  targetOf(c) ??
+  c.careerInterests[0]?.label ??
+  "your field";
+const skillOf = (c: MentorContext) =>
+  c.preferences?.skillsToLearn[0] ??
+  c.skills.find((k) => k.status === "target")?.name ??
+  null;
+
+/*
+ * The daily action library. Every step should feel like "oh, that’s easy —
+ * I can do that": mostly 2–10 minutes, a bigger version around 15–20.
+ * Never writing assignments, reports, or reflections.
+ */
 const TEMPLATES: Template[] = [
   {
-    id: "resume-projects",
-    category: "experience",
-    applies: (s, c) => college(s) && directed(s, c),
-    build: (c) => ({
-      why: `People hiring for ${tgt(c)} look for evidence you’ve built real things. A strong projects section is the fastest way to show it.`,
-      lighter: {
-        title: "List two projects you could put on your resume",
-        description: "Class projects count. Just the names and one line each.",
-        minutes: 5,
-      },
-      standard: {
-        title: "Spend 15 minutes updating the projects section of your resume",
-        description:
-          "Pick your strongest project and rewrite it as: what you built, how, and the result.",
-        minutes: 15,
-      },
-      stretch: {
-        title: "Rewrite every project on your resume with measurable outcomes",
-        description:
-          "Add numbers wherever you can — users, accuracy, time saved, scale.",
-        minutes: 30,
-      },
-    }),
+    id: "dream-company",
+    category: "career_exploration",
+    applies: (s, c) => directed(s, c),
+    build: (c) => {
+      const verb =
+        student(segmentOf(c)) || segmentOf(c) === "graduate"
+          ? "intern at"
+          : "work at";
+      // "AI Product Management" -> "AI company"; otherwise just "company".
+      const acronym = targetOf(c)?.match(/^([A-Z]{2,})\b/)?.[1];
+      const field = acronym ? `${acronym} ` : "";
+      return {
+        why: "Knowing which companies actually interest you makes it easier to target internships, people to follow, and skills to build.",
+        lighter: {
+          title: "Think of one product you love and who makes it",
+          description: "That company might be worth a closer look.",
+          minutes: 2,
+        },
+        standard: {
+          title: `Find one ${field}company you’d be excited to ${verb}`,
+          description: "Just one. Save its careers page for later.",
+          minutes: 5,
+        },
+        stretch: {
+          title: `Find three companies you’d be excited to ${verb}`,
+          description: "Save each careers page so they’re easy to find.",
+          minutes: 15,
+        },
+      };
+    },
   },
   {
-    id: "save-internships",
+    id: "follow-person",
+    category: "networking",
+    applies: (s, c) => directed(s, c),
+    build: (c) => {
+      const role = roleNoun(targetOf(c));
+      return {
+        why: "Seeing what people in your target role talk about helps you understand the job before you apply.",
+        lighter: {
+          title: `Look at one ${role}’s profile`,
+          description: "Notice where they started.",
+          minutes: 2,
+        },
+        standard: {
+          title: `Follow one ${role} on LinkedIn`,
+          description: "Pick someone who posts about their actual work.",
+          minutes: 3,
+        },
+        stretch: {
+          title: `Follow three people in ${tgt(c)} and save one post`,
+          description: "Keep the one that taught you something.",
+          minutes: 10,
+        },
+      };
+    },
+  },
+  {
+    id: "save-internship",
     category: "applications",
     applies: (s, c) => college(s) && directed(s, c),
     build: (c) => ({
-      why: `You want an internship in ${tgt(c)}. Collecting real postings now shows you deadlines and requirements before they sneak up on you.`,
+      why: "Real postings show you what employers want — and when deadlines hit.",
       lighter: {
-        title: `Find one ${tgt(c)} internship and save it`,
-        description:
-          "Use your school’s career portal or a job board. Note the deadline.",
-        minutes: 10,
+        title: `Search “${tgt(c)} intern” and skim what’s out there`,
+        description: "No saving needed yet.",
+        minutes: 3,
       },
       standard: {
-        title: `Find two ${tgt(c)} internships and save them`,
-        description: "Note each deadline and one requirement you already meet.",
-        minutes: 20,
-      },
-      stretch: {
-        title: `Find five ${tgt(c)} internships and compare their requirements`,
-        description:
-          "Which skills show up in most of them? That’s your study list.",
-        minutes: 35,
-      },
-    }),
-  },
-  {
-    id: "follow-people",
-    category: "networking",
-    applies: (s, c) => directed(s, c),
-    build: (c) => ({
-      why: `Following people who do ${tgt(c)} work is a low-effort way to learn the vocabulary, tools, and debates of the field.`,
-      lighter: {
-        title: `Follow one person who works in ${tgt(c)}`,
-        description:
-          "Someone who posts about their actual work, not just news.",
+        title: "Save one internship you’d actually apply to",
+        description: "Check your school’s career portal or a job board.",
         minutes: 5,
       },
-      standard: {
-        title: `Follow three people working in ${tgt(c)} and save one post that teaches you something`,
-        description: "Write one sentence about what you learned.",
-        minutes: 10,
-      },
       stretch: {
-        title: `Follow five people in ${tgt(c)} and leave one thoughtful comment`,
-        description:
-          "A genuine question or insight — it’s how conversations start.",
+        title: "Apply to one internship you’ve saved",
+        description: "Done is better than perfect.",
         minutes: 20,
       },
     }),
   },
   {
-    id: "alumni-note",
+    id: "save-role",
+    category: "applications",
+    applies: (s, c) => worker(s) && directed(s, c),
+    build: (c) => ({
+      why: "Real postings are the clearest picture of what the next role asks for.",
+      lighter: {
+        title: `Search for “${tgt(c)}” jobs and skim one`,
+        description: "Just see what’s out there.",
+        minutes: 3,
+      },
+      standard: {
+        title: `Save one ${tgt(c)} role you’d genuinely want`,
+        description: "Even if you’re not ready to apply.",
+        minutes: 5,
+      },
+      stretch: {
+        title: "Apply to one role you’ve saved",
+        description: "Done is better than perfect.",
+        minutes: 20,
+      },
+    }),
+  },
+  {
+    id: "linkedin-headline",
+    category: "skills",
+    applies: (s, c) => directed(s, c),
+    build: (c) => ({
+      why: "It’s the first thing recruiters and people in your field see.",
+      lighter: {
+        title: `See how two people in ${tgt(c)} word their headlines`,
+        description: "Borrow what works.",
+        minutes: 3,
+      },
+      standard: {
+        title: "Update your LinkedIn headline to say where you’re headed",
+        description: "One line is enough.",
+        minutes: 5,
+      },
+      stretch: {
+        title: "Refresh your LinkedIn headline and About section",
+        description: "Ask Mentr if you want a second opinion.",
+        minutes: 15,
+      },
+    }),
+  },
+  {
+    id: "resume-bullet",
+    category: "experience",
+    applies: (s) => careerSeekers(s) && s !== "high_school",
+    build: () => ({
+      why: "One strong bullet does more than a page of vague ones.",
+      lighter: {
+        title: "Pick the resume bullet you like least",
+        description: "That’s the one to fix next.",
+        minutes: 2,
+      },
+      standard: {
+        title: "Ask Mentr to sharpen one resume bullet",
+        description: "Paste it into chat and ask for a stronger version.",
+        minutes: 5,
+      },
+      stretch: {
+        title: "Improve three resume bullets with Mentr",
+        description: "Start with your most recent experience.",
+        minutes: 15,
+      },
+    }),
+  },
+  {
+    id: "learn-concept",
+    category: "learning",
+    applies: any,
+    build: (c) => {
+      const skill = skillOf(c);
+      return {
+        why: skill
+          ? `You said you want to learn ${skill}. A few minutes at a time adds up fast.`
+          : "Knowing the vocabulary makes everything else in the field easier to follow.",
+        lighter: {
+          title: skill
+            ? `Look up one ${skill} term you’ve heard but don’t get`
+            : "Look up one term you’ve heard but don’t fully get",
+          description: "A quick search is plenty.",
+          minutes: 3,
+        },
+        standard: {
+          title: skill
+            ? `Spend 5 minutes on the basics of ${skill}`
+            : `Learn one concept that keeps coming up in ${industryOf(c)}`,
+          description: "A short video or article is perfect.",
+          minutes: 5,
+        },
+        stretch: {
+          title: skill
+            ? `Watch one short tutorial on ${skill}`
+            : `Watch one short explainer about ${industryOf(c)}`,
+          description: "Something under 20 minutes.",
+          minutes: 20,
+        },
+      };
+    },
+  },
+  {
+    id: "alumni",
     category: "networking",
     applies: (s, c) => college(s) && directed(s, c),
     build: (c) => {
       const school = c.education?.school ? `${c.education.school} ` : "";
       return {
-        why: "Alumni are the warmest possible cold contacts. One short conversation can tell you more about a role than hours of reading.",
+        why: "Alumni are the warmest cold contacts there are — you already have something in common.",
         lighter: {
-          title: `Find one ${school}alum working in ${tgt(c)}`,
-          description:
-            "LinkedIn’s alumni search or your school’s alumni network are good places to look.",
-          minutes: 10,
+          title: "Open your school’s alumni page on LinkedIn",
+          description: "Search your school, then tap Alumni.",
+          minutes: 2,
         },
         standard: {
-          title: `Draft a short note to one ${school}alum working in ${tgt(c)}`,
-          description:
-            "Three sentences: who you are, what you admire about their path, one specific question.",
-          minutes: 20,
+          title: `Look up one ${school}alum working in ${tgt(c)}`,
+          description: "Just find them. No message needed yet.",
+          minutes: 5,
         },
         stretch: {
-          title: `Send notes to two ${school}alumni working in ${tgt(c)}`,
-          description: "Personalize each one. Ask for 15 minutes, not a job.",
-          minutes: 30,
+          title: "Send one alum a short, friendly note",
+          description: "Who you are, and one question about their path.",
+          minutes: 10,
         },
       };
     },
   },
   {
-    id: "job-description",
-    category: "career_exploration",
-    applies: (s, c) => directed(s, c),
-    build: (c) => ({
-      why: `Real job descriptions are the clearest map of what ${tgt(c)} requires — and where you already have a head start.`,
-      lighter: {
-        title: `Skim one ${tgt(c)} job description`,
-        description: "Highlight one skill you already have.",
-        minutes: 5,
-      },
-      standard: {
-        title: `Read one ${tgt(c)} job description and highlight what you already have`,
-        description:
-          "Then circle the one requirement you’d most like to build next.",
-        minutes: 15,
-      },
-      stretch: {
-        title: `Compare three ${tgt(c)} job descriptions`,
-        description:
-          "List requirements that appear in all three and rate yourself on each.",
-        minutes: 30,
-      },
-    }),
-  },
-  {
-    id: "learn-skill",
-    category: "learning",
-    applies: (_s, c) =>
-      Boolean(
-        c.preferences?.skillsToLearn.length ||
-        c.skills.some((k) => k.status === "target"),
-      ),
-    build: (c) => {
-      const skill =
-        c.preferences?.skillsToLearn[0] ??
-        c.skills.find((k) => k.status === "target")?.name ??
-        "a new skill";
-      return {
-        why: `You said you want to learn ${skill}. Short, regular sessions build it faster than occasional marathons.`,
-        lighter: {
-          title: `Spend 10 minutes on the basics of ${skill}`,
-          description:
-            "One short tutorial or chapter. Write down one thing you learned.",
-          minutes: 10,
-        },
-        standard: {
-          title: `Spend 20 minutes learning ${skill}`,
-          description:
-            "Follow along with a tutorial and try one exercise yourself.",
-          minutes: 20,
-        },
-        stretch: {
-          title: `Use ${skill} on a tiny real problem`,
-          description:
-            "Apply it to something from your life or coursework, even if it’s rough.",
-          minutes: 40,
-        },
-      };
-    },
-  },
-  {
-    id: "campus-orgs",
-    category: "experience",
-    applies: (s) => s === "student" || s === "high_school",
-    build: (c) => ({
-      why: `Campus organizations give you projects, leadership experience, and people already on the path${targetOf(c) ? ` to ${targetOf(c)}` : ""}.`,
-      lighter: {
-        title: "Look up your school’s student organization directory",
-        description: "Just find it and bookmark it.",
-        minutes: 5,
-      },
-      standard: {
-        title: "Shortlist two student organizations related to your goals",
-        description:
-          "Check when they meet next and put one meeting on your calendar.",
-        minutes: 15,
-      },
-      stretch: {
-        title: "Reach out to a leader of one student organization",
-        description: "Ask how new members usually get involved in projects.",
-        minutes: 25,
-      },
-    }),
-  },
-  {
-    id: "career-center",
+    id: "career-event",
     category: "applications",
     applies: (s) => s === "student",
     build: () => ({
-      why: "Career centers run resume reviews, mock interviews, and employer events that most students never use. It’s free leverage.",
+      why: "Career events are where employers and students actually meet — and most people skip them.",
       lighter: {
-        title: "Find your career center’s events page",
-        description: "Bookmark it for later.",
-        minutes: 5,
+        title: "Find where your school lists career events",
+        description: "Bookmark it.",
+        minutes: 2,
       },
       standard: {
-        title: "Check your career center’s upcoming events and save one",
-        description:
-          "Look for employer panels, info sessions, or resume workshops.",
-        minutes: 10,
+        title: "Look at one upcoming career event at your school",
+        description: "Employer panels and info sessions count.",
+        minutes: 5,
       },
       stretch: {
-        title: "Book a resume review or advising appointment",
-        description: "Bring a specific question about your target roles.",
-        minutes: 20,
+        title: "RSVP to one career event",
+        description: "Put it on your calendar.",
+        minutes: 8,
       },
     }),
   },
   {
-    id: "project-plan",
+    id: "campus-org",
     category: "experience",
-    applies: (s, c) => directed(s, c),
+    applies: (s) => student(s),
     build: (c) => ({
-      why: `A small project is proof you can do ${tgt(c)} work — and gives you something concrete to talk about.`,
+      why: `Clubs give you real projects and people already on the path${targetOf(c) ? ` to ${targetOf(c)}` : ""}.`,
       lighter: {
-        title: "Write down three project ideas you could finish in a weekend",
-        description: "Rough is fine.",
-        minutes: 10,
+        title: "Find your school’s club directory",
+        description: "Bookmark it for later.",
+        minutes: 2,
       },
       standard: {
-        title: `Write a one-page plan for a small project that shows ${tgt(c)} skills`,
-        description:
-          "Problem, who it’s for, what you’ll build, how you’ll know it worked.",
-        minutes: 25,
+        title: "Find one campus organization related to your goals",
+        description: "Check when it meets next.",
+        minutes: 5,
       },
       stretch: {
-        title: "Build the first working piece of your project",
-        description: "The smallest version that does something real.",
-        minutes: 45,
+        title: "Message one club to ask how to get involved",
+        description: "A two-line message is plenty.",
+        minutes: 8,
       },
     }),
   },
   {
-    id: "questions",
+    id: "interview-question",
+    category: "skills",
+    applies: (s, c) => directed(s, c) && s !== "high_school",
+    build: (c) => ({
+      why: "Saying an answer out loud once makes it far easier the next time it counts.",
+      lighter: {
+        title: `Read one common ${tgt(c)} interview question`,
+        description: "Just think about how you’d answer.",
+        minutes: 2,
+      },
+      standard: {
+        title: `Practice answering “Why ${tgt(c)}?” out loud`,
+        description: "Once is enough. Aim for 30 seconds.",
+        minutes: 5,
+      },
+      stretch: {
+        title: "Practice three interview questions with Mentr",
+        description: "Ask Mentr to play the interviewer.",
+        minutes: 15,
+      },
+    }),
+  },
+  {
+    id: "message-someone",
     category: "networking",
-    applies: (s, c) => careerSeekers(s) && Boolean(targetOf(c)),
+    applies: (s) => careerSeekers(s),
     build: (c) => ({
-      why: "Good questions make conversations with professionals easy and memorable. Prepare them before you need them.",
+      why: "Most opportunities come through people. Starting with someone you know is the easiest way in.",
       lighter: {
-        title: `Write one question you’d ask someone in ${tgt(c)}`,
-        description: "Something you can’t easily find online.",
-        minutes: 5,
-      },
-      standard: {
-        title: `Write three questions you’d ask someone working in ${tgt(c)}`,
-        description:
-          "Aim for questions about their day, their path, and what they wish they’d known.",
-        minutes: 10,
-      },
-      stretch: {
-        title: "Ask one of your questions to someone this week",
-        description: "In person, by message, or at an event.",
-        minutes: 20,
-      },
-    }),
-  },
-  {
-    id: "energy-log",
-    category: "career_exploration",
-    applies: (s, c) => exploring(s, c),
-    build: () => ({
-      why: "Your own patterns are the best clue to work that will suit you. This takes the guesswork out of “what do I want?”",
-      lighter: {
-        title: "Write down one moment this week you really enjoyed",
-        description: "What were you doing?",
-        minutes: 5,
+        title: `Think of one person who might know someone in ${tgt(c)}`,
+        description: "Friends, family, old coworkers all count.",
+        minutes: 2,
       },
       standard: {
         title:
-          "Write down three moments you felt energized recently — and what they had in common",
-        description:
-          "Look for patterns: people, problems, making, organizing, helping.",
-        minutes: 10,
+          "Message one person you already know about what you’re working toward",
+        description: "Keep it casual.",
+        minutes: 5,
       },
       stretch: {
-        title: "Turn your energy patterns into three possible directions",
-        description: "For each, name one job title to look into.",
-        minutes: 25,
+        title: "Ask one person for a 15-minute chat",
+        description: "Be specific about what you’d like to learn.",
+        minutes: 10,
       },
     }),
   },
   {
-    id: "compare-roles",
+    id: "save-article",
+    category: "learning",
+    applies: (s) => careerSeekers(s),
+    build: (c) => ({
+      why: `Knowing what’s happening in ${industryOf(c)} makes you sharper in every conversation.`,
+      lighter: {
+        title: `Skim today’s headlines in ${industryOf(c)}`,
+        description: "Two minutes is plenty.",
+        minutes: 2,
+      },
+      standard: {
+        title: `Save one article about what’s happening in ${industryOf(c)}`,
+        description: "Something you’d mention in a conversation.",
+        minutes: 5,
+      },
+      stretch: {
+        title: "Read one article and tell Mentr what surprised you",
+        description: "Mentr can explain why it matters for you.",
+        minutes: 15,
+      },
+    }),
+  },
+  {
+    id: "choose-skill",
+    category: "skills",
+    applies: (s) => careerSeekers(s),
+    build: () => ({
+      why: "Focusing on one skill beats spreading yourself thin.",
+      lighter: {
+        title: "Name one skill you wish you had",
+        description: "Just decide.",
+        minutes: 2,
+      },
+      standard: {
+        title: "Choose one skill to focus on this month",
+        description: "Pick the one that shows up most in roles you want.",
+        minutes: 3,
+      },
+      stretch: {
+        title: "Pick a skill and find one short course for it",
+        description: "Free is fine.",
+        minutes: 15,
+      },
+    }),
+  },
+  {
+    id: "explore-path",
     category: "career_exploration",
     applies: (s, c) => exploring(s, c),
     build: (c) => {
       const [a, b] = c.careerInterests.map((x) => x.label);
-      const pair =
-        a && b
-          ? `${a} and ${b}`
-          : a
-            ? `${a} and one other role`
-            : "two roles you’re curious about";
       return {
-        why: "Comparing concrete roles side by side turns a vague question into something you can actually reason about.",
+        why: "Seeing a real day in a role tells you more than any quiz.",
         lighter: {
-          title: `Look up what a typical day looks like in ${a ?? "one role you’re curious about"}`,
-          description: "One article or video is enough.",
-          minutes: 10,
+          title: "Pick one career you’re curious about",
+          description: "Any one. You can change your mind.",
+          minutes: 2,
         },
         standard: {
-          title: `Compare ${pair}: what does a typical day look like in each?`,
-          description: "Note what sounds exciting and what sounds draining.",
-          minutes: 20,
+          title: a
+            ? `Explore ${a} for 5 minutes`
+            : "Explore one career path for 5 minutes",
+          description: "Try a “day in the life” video.",
+          minutes: 5,
         },
         stretch: {
-          title: `Find one person in each of ${pair} and read how they got there`,
-          description: "Look for their first job and the skills they mention.",
-          minutes: 30,
+          title:
+            a && b
+              ? `Compare ${a} and ${b}`
+              : "Compare two paths you’re curious about",
+          description: "Ask Mentr what a typical week looks like in each.",
+          minutes: 15,
         },
       };
     },
   },
   {
-    id: "skills-inventory",
-    category: "skills",
-    applies: any,
+    id: "notice-energy",
+    category: "career_exploration",
+    applies: (s, c) => exploring(s, c),
     build: () => ({
-      why: "Knowing exactly what you’re good at — with examples — makes every application, conversation, and decision easier.",
+      why: "What you enjoy is the best clue to work that will suit you.",
       lighter: {
-        title: "List three things you’re good at",
-        description: "One example for each.",
-        minutes: 5,
+        title: "Think of the best part of your week",
+        description: "What were you doing?",
+        minutes: 2,
       },
       standard: {
-        title: "List five skills you’ve used this year, with one example each",
-        description: "Include things from classes, jobs, clubs, or life.",
-        minutes: 15,
+        title: "Notice one moment today you lost track of time",
+        description: "A quick note on your phone is enough.",
+        minutes: 2,
       },
       stretch: {
-        title: "Turn your skill examples into three resume bullet points",
-        description: "Action verb, what you did, result.",
-        minutes: 25,
+        title: "Ask Mentr what your interests might add up to",
+        description: "Share a few things you enjoy.",
+        minutes: 10,
       },
     }),
   },
   {
-    id: "wins",
+    id: "save-posting",
+    category: "career_exploration",
+    applies: (s, c) => exploring(s, c),
+    build: () => ({
+      why: "Real postings make fuzzy careers concrete — you’ll see what the work actually is.",
+      lighter: {
+        title: "Search one job title that sounds interesting",
+        description: "Just look.",
+        minutes: 3,
+      },
+      standard: {
+        title: "Save one job posting that sounds interesting",
+        description: "Even if you’re nowhere near ready.",
+        minutes: 5,
+      },
+      stretch: {
+        title: "Save three postings from different fields",
+        description: "Notice which ones pull you in.",
+        minutes: 15,
+      },
+    }),
+  },
+  {
+    id: "ask-focus",
+    category: "career_exploration",
+    applies: any,
+    build: () => ({
+      why: "A quick check-in keeps your week pointed at what matters most.",
+      lighter: {
+        title: "Ask Mentr one question you’ve been sitting on",
+        description: "Anything goes.",
+        minutes: 2,
+      },
+      standard: {
+        title: "Ask Mentr what you should focus on this week",
+        description: "It already knows your goals.",
+        minutes: 3,
+      },
+      stretch: {
+        title: "Talk through your next month with Mentr",
+        description: "Leave with one clear priority.",
+        minutes: 15,
+      },
+    }),
+  },
+  {
+    id: "win",
     category: "experience",
     applies: (s) => worker(s),
     build: () => ({
-      why: "Quantified wins are the raw material for promotions, resumes, and interviews — and they’re easy to forget.",
+      why: "Wins with numbers are what make reviews, resumes, and interviews easy.",
       lighter: {
-        title: "Write down one win from the last month",
-        description: "Include a number if you can.",
-        minutes: 5,
+        title: "Think of one thing you’re proud of this month",
+        description: "Big or small.",
+        minutes: 2,
       },
       standard: {
-        title: "Write down three wins from the last quarter, with numbers",
-        description: "Time saved, revenue, customers, quality — whatever fits.",
+        title: "Save one recent win in your notes, with a number",
+        description: "Time saved, customers, revenue — whatever fits.",
+        minutes: 3,
+      },
+      stretch: {
+        title: "Add your best recent win to your resume",
+        description: "Ask Mentr to help phrase it.",
         minutes: 15,
       },
-      stretch: {
-        title: "Turn your wins into a one-paragraph brag document",
-        description: "Useful for reviews, networking, and your resume.",
-        minutes: 30,
-      },
     }),
   },
   {
-    id: "coffee-chat",
-    category: "networking",
-    applies: (s) => worker(s),
-    build: (c) => ({
-      why: `Conversations with people already doing ${tgt(c)} work are how most role changes actually happen.`,
-      lighter: {
-        title: `Identify one person in a role you admire`,
-        description: "Inside or outside your company.",
-        minutes: 5,
-      },
-      standard: {
-        title: `Ask one person working in ${tgt(c)} for a 20-minute chat`,
-        description: "Be specific about why them and what you’d like to learn.",
-        minutes: 10,
-      },
-      stretch: {
-        title: "Reach out to two people and prepare questions for each",
-        description: "Tailor the questions to their path.",
-        minutes: 30,
-      },
-    }),
-  },
-  {
-    id: "problem-statement",
+    id: "customers",
     category: "business",
     applies: founderWithIdea,
     build: () => ({
-      why: "A sharp problem statement drives every later decision — who you sell to, what you build, and how you price.",
+      why: "Talking to real potential customers is the cheapest way to find out if the idea works.",
       lighter: {
-        title: "Write one sentence: who has the problem you’re solving?",
-        description: "Be as specific as possible.",
-        minutes: 5,
+        title: "Name one person who has the problem you’re solving",
+        description: "A real person.",
+        minutes: 2,
       },
       standard: {
-        title: "Write a one-sentence problem statement",
-        description:
-          "Who has the problem, how often, and what it costs them today.",
-        minutes: 10,
+        title: "Name three people who have the problem you’re solving",
+        description: "Real names or places to find them.",
+        minutes: 5,
       },
       stretch: {
-        title: "Test your problem statement on two potential customers",
-        description: "Do they say “yes, exactly”? Note their words.",
-        minutes: 30,
+        title: "Message one of them to ask about the problem",
+        description: "Ask about the problem, not your idea.",
+        minutes: 10,
       },
     }),
   },
   {
-    id: "customer-list",
+    id: "alternative",
     category: "business",
     applies: founderWithIdea,
     build: () => ({
-      why: "Talking to real potential customers is the cheapest way to find out if your idea works — before you spend money.",
+      why: "Your customers already use something. Their complaints about it are your opening.",
       lighter: {
-        title: "Write down three people who have the problem you’re solving",
-        description: "Real names or specific places to find them.",
-        minutes: 5,
+        title: "Think of one thing customers use instead of you today",
+        description: "Even a workaround counts.",
+        minutes: 2,
       },
       standard: {
-        title: "List five potential customers and how you could reach each one",
-        description: "Friends of friends, local groups, online communities.",
+        title: "Find one product your customers use instead",
+        description: "Save the link.",
+        minutes: 5,
+      },
+      stretch: {
+        title: "Skim five reviews of that product",
+        description: "Look for the same complaint twice.",
         minutes: 15,
       },
-      stretch: {
-        title: "Have one customer conversation this week",
-        description: "Ask about the problem, not your solution.",
-        minutes: 30,
-      },
     }),
   },
   {
-    id: "alternatives",
+    id: "price-check",
     category: "business",
     applies: founderWithIdea,
     build: () => ({
-      why: "Customers always have an alternative, even if it’s doing nothing. Your opening is in what they dislike about it.",
+      why: "Knowing what similar things sell for keeps your pricing grounded in reality.",
       lighter: {
-        title: "Name one alternative your customers use today",
-        description: "Even if it’s a workaround.",
+        title: "Look up the price of one similar product",
+        description: "Just one.",
+        minutes: 3,
+      },
+      standard: {
+        title: "Look up what three similar products sell for",
+        description: "Note the range.",
         minutes: 5,
       },
-      standard: {
-        title:
-          "List three alternatives your customers use and what they dislike about each",
-        description: "Reviews and forums are great sources.",
-        minutes: 20,
-      },
       stretch: {
-        title:
-          "Write your positioning: how you’re different from each alternative",
-        description: "One line per alternative.",
-        minutes: 30,
+        title: "Estimate what one unit costs you to make",
+        description: "Rough numbers are fine. Mentr can help.",
+        minutes: 15,
       },
     }),
   },
   {
-    id: "unit-cost",
+    id: "one-liner",
     category: "business",
     applies: founderWithIdea,
     build: () => ({
-      why: "If you don’t know what one unit costs you, you can’t price it — and you can’t tell whether the business can work.",
+      why: "If you can say it in one sentence, other people can repeat it.",
       lighter: {
-        title: "List every cost that goes into one unit of your offering",
-        description: "Materials, packaging, time, fees, shipping.",
-        minutes: 10,
+        title: "Try saying your idea in one sentence",
+        description: "Out loud counts.",
+        minutes: 2,
       },
       standard: {
-        title: "Estimate the cost to make or deliver one unit",
-        description: "Rough numbers are fine; mark which ones are guesses.",
-        minutes: 20,
+        title: "Text your one-sentence idea to a friend",
+        description: "See if they get it right away.",
+        minutes: 3,
       },
       stretch: {
-        title: "Calculate your margin at three different prices",
-        description: "Price minus unit cost, as a percentage.",
-        minutes: 30,
+        title: "Ask two people what they’d pay for it",
+        description: "Listen more than you pitch.",
+        minutes: 15,
       },
     }),
   },
   {
-    id: "problem-journal",
+    id: "notice-problem",
     category: "business",
     applies: founderNoIdea,
     build: () => ({
-      why: "Good business ideas usually start with a real, frequent frustration. Writing them down makes them visible.",
+      why: "Good business ideas usually start as an everyday annoyance someone would pay to fix.",
       lighter: {
-        title: "Write down one frustration you noticed today",
-        description: "Yours or someone else’s.",
-        minutes: 5,
+        title: "Think of one thing that annoyed you this week",
+        description: "Anything counts.",
+        minutes: 2,
       },
       standard: {
-        title: "Write down three frustrations you noticed today",
-        description: "Who had them, and how often do they happen?",
-        minutes: 10,
+        title: "Notice one everyday frustration today",
+        description: "Save it in your notes.",
+        minutes: 2,
       },
       stretch: {
-        title: "Ask two people about the most annoying part of their week",
+        title: "Ask one person about the most annoying part of their week",
         description: "Listen for problems people would pay to solve.",
-        minutes: 25,
+        minutes: 10,
       },
     }),
   },
   {
-    id: "skills-to-ideas",
+    id: "strength",
     category: "business",
     applies: founderNoIdea,
     build: () => ({
       why: "Businesses built on your strengths are easier to start and more fun to run.",
       lighter: {
-        title: "List your top three skills",
-        description: "Things people ask you for help with count.",
-        minutes: 5,
+        title: "Think of one thing people ask you for help with",
+        description: "That’s a strength.",
+        minutes: 2,
       },
       standard: {
-        title:
-          "List your top five skills and one problem each could help solve",
-        description: "Don’t filter — quantity first.",
-        minutes: 15,
+        title: "Pick one thing people often ask you for help with",
+        description: "Just name it.",
+        minutes: 3,
       },
       stretch: {
-        title: "Pick your best skill-problem pair and sketch a tiny offer",
-        description: "Who it’s for, what they get, what you’d charge.",
-        minutes: 30,
+        title: "Ask Mentr what businesses could come from it",
+        description: "Share the skill and see what comes up.",
+        minutes: 10,
       },
     }),
   },
@@ -1225,6 +1358,8 @@ export type DailyActionOptions = {
   seed?: string;
   /** Prefer a different template than the one being replaced. */
   excludeCategory?: Category;
+  /** Templates to favor (e.g. the most inviting ones for a first day). */
+  preferIds?: string[];
 };
 
 export function rulesDailyAction(
@@ -1245,9 +1380,10 @@ export function rulesDailyAction(
         ),
     );
 
+  // Everything used recently? A repeat beats no step at all.
   const pool = candidates.length
     ? candidates
-    : TEMPLATES.filter((t) => t.id === "skills-inventory").map((t) => ({
+    : TEMPLATES.filter((t) => t.applies(seg, ctx)).map((t) => ({
         t,
         built: t.build(ctx),
       }));
@@ -1257,6 +1393,7 @@ export function rulesDailyAction(
       const used = recentCats.filter((c) => c === t.category).length;
       const excluded = opts.excludeCategory === t.category ? 10 : 0;
       // Prefer actions that advance an existing milestone.
+      const preferred = opts.preferIds?.includes(t.id) ? -5 : 0;
       const unlinked =
         opts.milestones.length &&
         !opts.milestones.some((x) => x.category === t.category)
@@ -1269,6 +1406,7 @@ export function rulesDailyAction(
           used * 3 +
           excluded +
           unlinked +
+          preferred +
           (hash(`${seed}:${t.id}`) % 100) / 100,
       };
     })

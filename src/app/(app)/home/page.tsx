@@ -1,14 +1,8 @@
-import {
-  ArrowRight,
-  CalendarCheck,
-  GraduationCap,
-  MessageCircle,
-} from "lucide-react";
+import { ArrowRight, CalendarCheck, MessageCircle } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { PageContainer, Section } from "@/components/app/page";
-import { ProgressSummary } from "@/components/dashboard/progress-summary";
 import { RoadmapSnapshot } from "@/components/dashboard/roadmap-snapshot";
 import {
   TodayActionCard,
@@ -28,18 +22,16 @@ export const maxDuration = 60;
 function contextLine(b: HomeBasics): string | null {
   if (b.userType === "entrepreneur") {
     return b.ventureIdea
-      ? `You’re building: ${b.ventureIdea}`
-      : "You’re looking for a business idea worth building.";
+      ? `Building: ${b.ventureIdea}`
+      : "Finding a business idea worth building.";
   }
   if (b.roadmap?.mode === "exploring") {
     return b.interests.length
-      ? `You’re exploring a few directions, including ${b.interests.slice(0, 2).join(" and ")}.`
-      : "You’re figuring out what’s next — one small experiment at a time.";
+      ? `Exploring ${b.interests.slice(0, 2).join(" and ")}.`
+      : "Figuring out what’s next, one small step at a time.";
   }
   const target = b.interests[0];
-  return target
-    ? `You’re working toward ${target}.`
-    : (b.roadmap?.northStar ?? null);
+  return target ? `Focused on ${target}.` : (b.roadmap?.northStar ?? null);
 }
 
 const PROMPTS: Record<string, string[]> = {
@@ -128,43 +120,36 @@ export default async function HomePage() {
             basics.userType === "career_changer"
           ? "pro"
           : "student";
+  const steps = basics.progress.totalCompleted;
 
   return (
     <PageContainer>
       <header>
-        <h1 className="text-3xl font-semibold sm:text-4xl">
+        <h1 className="text-display text-[2.75rem] sm:text-6xl">
           {greetingFor(basics.hour)}
           {basics.firstName ? `, ${basics.firstName}` : ""}.
         </h1>
         {line ? (
-          <p className="mt-2 text-pretty text-muted-foreground">{line}</p>
+          <p className="mt-3 text-lg text-pretty text-muted-foreground">
+            {line}
+          </p>
         ) : null}
       </header>
 
       {basics.checkinDue ? (
         <Link
           href="/checkin"
-          className="mt-6 flex items-center gap-3 rounded-2xl border border-primary/25 bg-accent/60 p-4 transition-colors hover:bg-accent"
+          className="group mt-8 flex items-center gap-3 text-sm font-medium text-primary"
         >
-          <CalendarCheck className="size-5 shrink-0 text-primary" />
-          <span className="min-w-0 flex-1">
-            <span className="block font-medium">
-              Your weekly check-in is ready
-            </span>
-            <span className="block text-sm text-muted-foreground">
-              Two minutes to look back and set up next week.
-            </span>
-          </span>
-          <ArrowRight className="size-4 text-muted-foreground" />
+          <CalendarCheck className="size-4" />
+          Your weekly check-in is ready — two minutes
+          <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
         </Link>
       ) : null}
 
-      <div className="mt-8">
+      <div className="mt-10">
         <Suspense fallback={<TodayActionSkeleton />}>
-          <TodaySection
-            userId={user.id}
-            totalCompleted={basics.progress.totalCompleted}
-          />
+          <TodaySection userId={user.id} totalCompleted={steps} />
         </Suspense>
       </div>
 
@@ -175,47 +160,25 @@ export default async function HomePage() {
       </Section>
 
       {basics.roadmap ? (
-        <Section title="Your roadmap">
+        <Section title="Where you’re headed">
           <RoadmapSnapshot roadmap={basics.roadmap} isStudent={isStudent} />
         </Section>
       ) : null}
 
-      <Section title="Your progress">
-        <ProgressSummary progress={basics.progress} />
-      </Section>
-
-      <Section title="Recommended for you">
-        <div className="grid gap-3 sm:grid-cols-2">
-          {basics.university ? (
-            <Link
-              href="/explore/campus"
-              className="group rounded-2xl border bg-card p-4 transition-colors hover:border-primary/30"
-            >
-              <GraduationCap className="size-5 text-primary" />
-              <p className="mt-3 font-medium">Your campus resources</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Career center, advising, and more at {basics.university.name}.
-              </p>
-            </Link>
-          ) : null}
-          <div className="rounded-2xl border bg-card p-4">
-            <MessageCircle className="size-5 text-primary" />
-            <p className="mt-3 font-medium">Ask your mentor</p>
-            <ul className="mt-2 space-y-1.5">
-              {PROMPTS[promptKey].map((q) => (
-                <li key={q}>
-                  <Link
-                    href={`/mentor?q=${encodeURIComponent(q)}`}
-                    className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-                  >
-                    “{q}”
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </Section>
+      <footer className="mt-16 flex flex-wrap items-center justify-between gap-3 border-t pt-6 text-sm text-muted-foreground">
+        <span>
+          {steps > 0
+            ? `${steps} ${steps === 1 ? "step" : "steps"} taken so far`
+            : "Your first step is above"}
+        </span>
+        <Link
+          href={`/mentor?q=${encodeURIComponent(PROMPTS[promptKey][0])}`}
+          className="group inline-flex items-center gap-1.5 font-medium hover:text-foreground"
+        >
+          <MessageCircle className="size-4" />
+          Ask Mentr: “{PROMPTS[promptKey][0]}”
+        </Link>
+      </footer>
     </PageContainer>
   );
 }

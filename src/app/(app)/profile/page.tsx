@@ -87,7 +87,7 @@ export default async function ProfilePage() {
 
       <Section title="Saved">
         {saved?.length ? (
-          <ul className="divide-y rounded-2xl border bg-card">
+          <ul className="divide-y border-y">
             {saved.map((s) => {
               const item = s.university_resources
                 ? {
@@ -104,7 +104,7 @@ export default async function ProfilePage() {
                     href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between gap-3 px-4 py-3 text-sm hover:bg-muted/40"
+                    className="flex items-center justify-between gap-3 py-3.5 text-sm hover:text-foreground"
                   >
                     {item.name}
                     <ExternalLink className="size-4 text-muted-foreground" />
@@ -121,10 +121,10 @@ export default async function ProfilePage() {
       </Section>
 
       <Section title="Settings">
-        <div className="divide-y rounded-2xl border bg-card">
+        <div className="divide-y border-y">
           <Link
             href="/checkin"
-            className="flex items-center gap-3 px-4 py-3.5 text-sm hover:bg-muted/40"
+            className="flex items-center gap-3 py-4 text-sm hover:text-foreground"
           >
             <CalendarCheck className="size-4 text-muted-foreground" />
             <span className="flex-1">Weekly check-in</span>
@@ -132,7 +132,7 @@ export default async function ProfilePage() {
           </Link>
           <Link
             href="/settings/notifications"
-            className="flex items-center gap-3 px-4 py-3.5 text-sm hover:bg-muted/40"
+            className="flex items-center gap-3 py-4 text-sm hover:text-foreground"
           >
             <Bell className="size-4 text-muted-foreground" />
             <span className="flex-1">Notifications</span>

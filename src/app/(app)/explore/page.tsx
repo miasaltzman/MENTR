@@ -51,13 +51,13 @@ export default async function ExplorePage() {
     <PageContainer>
       <PageHeader
         title="Explore"
-        description="Real resources and opportunities, chosen for where you’re headed."
+        description="Real resources, chosen for where you’re headed."
       />
 
       {edu?.universities ? (
         <Link
           href="/explore/campus"
-          className="flex items-center gap-4 rounded-2xl border bg-card p-5 transition-colors hover:border-primary/30"
+          className="flex items-center gap-4 rounded-3xl bg-muted/60 p-5 transition-colors hover:bg-muted"
         >
           <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent text-accent-foreground">
             <GraduationCap className="size-5" />
@@ -76,12 +76,14 @@ export default async function ExplorePage() {
           These are being connected to real, current data sources. We won’t show
           anything here until it comes from a source we can cite and date.
         </p>
-        <ul className="grid gap-3 sm:grid-cols-2">
+        <ul className="divide-y border-y">
           {COMING.map(({ icon: Icon, title, body }) => (
-            <li key={title} className="rounded-2xl border border-dashed p-4">
-              <Icon className="size-5 text-muted-foreground" />
-              <p className="mt-3 font-medium">{title}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+            <li key={title} className="flex gap-4 py-5">
+              <Icon className="mt-0.5 size-5 shrink-0 text-muted-foreground" />
+              <span>
+                <p className="font-medium">{title}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+              </span>
             </li>
           ))}
         </ul>

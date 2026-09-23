@@ -320,8 +320,9 @@ export const STEPS: Step[] = [
     key: "name",
     kind: "text",
     tier: "core",
-    prompt:
-      "Hi — I’m Mentr. I’ll help you figure out where you’re headed and what to do next. First, what should I call you?",
+    prompt: "Hi, I’m Mentr. What should I call you?",
+    helper:
+      "I’ll help you figure out what to do next — one small step at a time.",
     placeholder: "Your first name",
     maxLength: 60,
   },

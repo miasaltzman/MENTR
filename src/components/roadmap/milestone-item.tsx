@@ -67,12 +67,7 @@ export function MilestoneItem({ milestone }: { milestone: Milestone }) {
         : "Not started";
 
   return (
-    <li
-      className={cn(
-        "rounded-xl border bg-card p-4",
-        (done || skipped) && "bg-card/60",
-      )}
-    >
+    <li className="py-4">
       <div className="flex items-start gap-3">
         <button
           type="button"

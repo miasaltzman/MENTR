@@ -1,5 +1,5 @@
-import { CATEGORY_LABELS } from "@/lib/domain/labels";
 import type { Progress } from "@/lib/data/dashboard";
+import { CATEGORY_LABELS } from "@/lib/domain/labels";
 import type { Enums } from "@/types/database";
 
 export function ProgressSummary({ progress }: { progress: Progress }) {
@@ -11,59 +11,38 @@ export function ProgressSummary({ progress }: { progress: Progress }) {
   ][];
 
   return (
-    <div className="rounded-2xl border bg-card p-5">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <p className="text-pretty">
-          <span className="text-3xl font-semibold tabular-nums">
-            {progress.totalCompleted}
-          </span>{" "}
-          <span className="text-muted-foreground">
-            growth {progress.totalCompleted === 1 ? "action" : "actions"}{" "}
-            completed
-            {progress.milestonesCompleted
-              ? ` · ${progress.milestonesCompleted} milestone${progress.milestonesCompleted === 1 ? "" : "s"}`
-              : ""}
-          </span>
-        </p>
-        <p
-          className="text-sm text-muted-foreground"
-          aria-label={`Active ${progress.activeDaysLast7} of the last 7 days`}
-        >
-          <span
-            className="mr-2 inline-flex gap-1 align-middle"
-            aria-hidden="true"
-          >
-            {Array.from({ length: 7 }, (_, i) => (
-              <span
-                key={i}
-                className={
-                  i < progress.activeDaysLast7
-                    ? "size-2 rounded-full bg-primary"
-                    : "size-2 rounded-full bg-muted"
-                }
-              />
-            ))}
-          </span>
-          {progress.activeDaysLast7} of the last 7 days
-        </p>
-      </div>
-      {cats.length ? (
-        <ul className="mt-4 flex flex-wrap gap-2">
-          {cats.map(([cat, n]) => (
-            <li
-              key={cat}
-              className="rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground"
-            >
-              {CATEGORY_LABELS[cat]} · {n}
-            </li>
+    <div>
+      <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <span className="text-display text-5xl tabular-nums">
+          {progress.totalCompleted}
+        </span>
+        <span className="text-muted-foreground">
+          {progress.totalCompleted === 1 ? "step" : "steps"} taken
+          {progress.milestonesCompleted
+            ? ` · ${progress.milestonesCompleted} milestone${progress.milestonesCompleted === 1 ? "" : "s"}`
+            : ""}
+        </span>
+      </p>
+      <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+        <span className="inline-flex gap-1" aria-hidden="true">
+          {Array.from({ length: 7 }, (_, i) => (
+            <span
+              key={i}
+              className={
+                i < progress.activeDaysLast7
+                  ? "size-1.5 rounded-full bg-primary"
+                  : "size-1.5 rounded-full bg-border"
+              }
+            />
           ))}
-        </ul>
-      ) : (
-        <p className="mt-3 text-sm text-muted-foreground">
-          Every action you finish shows up here, grouped by what it builds —
-          skills, networking, experience and more.
+        </span>
+        Active {progress.activeDaysLast7} of the last 7 days
+      </p>
+      {cats.length ? (
+        <p className="mt-4 text-sm text-muted-foreground">
+          {cats.map(([cat, n]) => `${CATEGORY_LABELS[cat]} ${n}`).join(" · ")}
         </p>
-      )}
+      ) : null}
     </div>
   );
 }

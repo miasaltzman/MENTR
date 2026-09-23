@@ -77,7 +77,7 @@ function Row({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
         <p className="font-medium">{title}</p>
         <p className="text-sm text-muted-foreground">{description}</p>
@@ -108,7 +108,7 @@ export function NotificationForm({ initial }: { initial: Prefs }) {
         });
       }}
     >
-      <div className="divide-y rounded-2xl border bg-card">
+      <div className="divide-y border-y">
         <Row
           title="Daily growth reminder"
           description="A gentle nudge with today’s 1% action."
@@ -194,7 +194,7 @@ export function NotificationForm({ initial }: { initial: Prefs }) {
         </Row>
       </div>
 
-      <div className="rounded-2xl border bg-card px-4 py-4">
+      <div className="border-y py-5">
         <div className="flex items-center justify-between gap-3">
           <Label htmlFor="email-channel" className="font-medium">
             Email

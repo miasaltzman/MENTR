@@ -5,7 +5,6 @@ import {
   ArrowUpToLine,
   Check,
   ChevronDown,
-  Clock,
   Loader2,
   MessageCircle,
   MoreHorizontal,
@@ -43,6 +42,12 @@ type Props = {
   totalCompleted: number;
 };
 
+const ordinal = (n: number) => {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
+};
+
 export function TodayActionCard({
   action,
   milestoneTitle,
@@ -51,8 +56,8 @@ export function TodayActionCard({
   const [pending, startTransition] = useTransition();
   const [busy, setBusy] = useState<string | null>(null);
   const [showWhy, setShowWhy] = useState(false);
-  const [reflection, setReflection] = useState("");
-  const [reflectionSaved, setReflectionSaved] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [note, setNote] = useState("");
 
   const run = (
     label: string,
@@ -70,128 +75,122 @@ export function TodayActionCard({
 
   const done = action.status === "completed";
   const skipped = action.status === "skipped";
-  const askHref = `/mentor?q=${encodeURIComponent(`Why is “${action.title}” a good next step for me, and how should I approach it?`)}`;
+  const askHref = `/mentor?q=${encodeURIComponent(`How should I approach this: “${action.title}”?`)}`;
 
   return (
     <article
       aria-labelledby="today-title"
-      className={cn(
-        "relative overflow-hidden rounded-2xl border bg-card p-5 shadow-sm sm:p-6",
-        done && "border-primary/30",
-      )}
+      className="rounded-[1.75rem] bg-card p-6 shadow-[0_1px_2px_oklch(0.2_0.01_70/0.05),0_12px_32px_-16px_oklch(0.2_0.01_70/0.14)] sm:p-8"
     >
-      <div className="flex items-center justify-between gap-3 text-xs">
-        <span className="font-semibold tracking-wide text-primary uppercase">
-          Your 1% today
-        </span>
-        <span className="flex items-center gap-1.5 text-muted-foreground">
-          <Clock className="size-3.5" />~{action.estimated_minutes} min ·{" "}
-          {CATEGORY_LABELS[action.category]}
-        </span>
-      </div>
-
+      <p className="text-sm font-medium text-primary">Your 1% today</p>
       <h2
         id="today-title"
         className={cn(
-          "mt-3 text-xl leading-snug font-semibold text-balance sm:text-2xl",
-          done && "text-muted-foreground line-through decoration-primary/40",
+          "mt-3 text-[1.625rem] leading-[1.2] font-semibold tracking-tight text-balance sm:text-[1.875rem]",
+          done && "text-muted-foreground",
         )}
       >
         {action.title}
       </h2>
-      {action.description && !done ? (
-        <p className="mt-2 text-pretty text-muted-foreground">
-          {action.description}
-        </p>
-      ) : null}
+      <p className="mt-2 text-sm text-muted-foreground">
+        ~{action.estimated_minutes} min · {CATEGORY_LABELS[action.category]}
+      </p>
 
       {done ? (
-        <div className="mt-5 space-y-4">
-          <p className="flex items-center gap-2 font-medium">
+        <div className="mt-6 animate-in duration-300 fade-in">
+          <p className="flex items-center gap-2.5 font-medium">
             <span className="flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground">
               <Check className="size-3.5" />
             </span>
-            Done. That’s {totalCompleted} growth{" "}
-            {totalCompleted === 1 ? "action" : "actions"} so far.
+            Done — that’s your {ordinal(totalCompleted)} step.
           </p>
-          {!reflectionSaved ? (
+          <div className="mt-3 flex items-center gap-4 pl-8.5 text-sm">
+            {!noteOpen ? (
+              <button
+                type="button"
+                className="text-muted-foreground hover:text-foreground"
+                onClick={() => setNoteOpen(true)}
+              >
+                Add a note
+              </button>
+            ) : null}
+            <button
+              type="button"
+              className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
+              disabled={pending}
+              onClick={() => run("undo", () => undoDailyAction(action.id))}
+            >
+              <Undo2 className="size-3.5" />
+              Undo
+            </button>
+          </div>
+          {noteOpen ? (
             <form
-              className="space-y-2"
+              className="mt-3 space-y-2 pl-8.5"
               onSubmit={(e) => {
                 e.preventDefault();
-                if (!reflection.trim()) return;
+                if (!note.trim()) return;
                 run(
-                  "reflect",
-                  () => saveActionReflection(action.id, reflection),
-                  "Saved your note",
+                  "note",
+                  () => saveActionReflection(action.id, note),
+                  "Saved",
                 );
-                setReflectionSaved(true);
+                setNoteOpen(false);
               }}
             >
-              <label
-                htmlFor="reflection"
-                className="text-sm text-muted-foreground"
-              >
-                Anything you learned or want to remember? (optional)
-              </label>
               <Textarea
-                id="reflection"
-                value={reflection}
-                onChange={(e) => setReflection(e.target.value)}
+                autoFocus
+                aria-label="Note"
+                placeholder="Anything worth remembering?"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
                 maxLength={1000}
                 className="min-h-16"
               />
-              <div className="flex gap-2">
-                <Button
-                  type="submit"
-                  size="sm"
-                  variant="secondary"
-                  disabled={!reflection.trim() || pending}
-                >
-                  Save note
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="ghost"
-                  className="text-muted-foreground"
-                  disabled={pending}
-                  onClick={() => run("undo", () => undoDailyAction(action.id))}
-                >
-                  <Undo2 />
-                  Undo
-                </Button>
-              </div>
+              <Button
+                type="submit"
+                size="sm"
+                variant="secondary"
+                disabled={!note.trim() || pending}
+              >
+                Save
+              </Button>
             </form>
           ) : null}
         </div>
       ) : skipped ? (
-        <div className="mt-5 space-y-3">
+        <div className="mt-6 space-y-3">
           <p className="text-muted-foreground">
-            Skipped for today. No problem — tomorrow brings a new one.
+            Skipped for today. No problem.
           </p>
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
+            className="rounded-full"
             disabled={pending}
             onClick={() =>
-              run("different", () => replaceDailyAction(action.id, "different"))
+              run("another", () => replaceDailyAction(action.id, "different"))
             }
           >
-            {busy === "different" ? (
+            {busy === "another" ? (
               <Loader2 className="animate-spin" />
             ) : (
               <RefreshCw />
             )}
-            Actually, give me a different one
+            Give me another
           </Button>
         </div>
       ) : (
         <>
-          <div className="mt-5 flex flex-wrap items-center gap-2">
+          {action.description ? (
+            <p className="mt-4 text-pretty text-muted-foreground">
+              {action.description}
+            </p>
+          ) : null}
+          <div className="mt-6 flex flex-wrap items-center gap-2">
             <Button
               size="lg"
-              className="rounded-full px-5"
+              className="h-11 rounded-full px-6"
               disabled={pending}
               onClick={() =>
                 run("complete", () => completeDailyAction(action.id))
@@ -202,11 +201,22 @@ export function TodayActionCard({
               ) : (
                 <Check />
               )}
-              Mark done
+              Done
             </Button>
             <Button
               variant="ghost"
-              className="rounded-full"
+              className="h-11 rounded-full"
+              disabled={pending}
+              onClick={() =>
+                run("another", () => replaceDailyAction(action.id, "different"))
+              }
+            >
+              {busy === "another" ? <Loader2 className="animate-spin" /> : null}
+              Give me another
+            </Button>
+            <Button
+              variant="ghost"
+              className="h-11 rounded-full text-muted-foreground"
               aria-expanded={showWhy}
               onClick={() => setShowWhy((v) => !v)}
             >
@@ -220,28 +230,20 @@ export function TodayActionCard({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="ml-auto rounded-full"
+                  className="ml-auto size-11 rounded-full text-muted-foreground"
                   aria-label="More options"
                   disabled={pending}
                 >
-                  {busy && busy !== "complete" ? (
+                  {busy === "lighter" ||
+                  busy === "stretch" ||
+                  busy === "skip" ? (
                     <Loader2 className="animate-spin" />
                   ) : (
                     <MoreHorizontal />
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem
-                  onSelect={() =>
-                    run("different", () =>
-                      replaceDailyAction(action.id, "different"),
-                    )
-                  }
-                >
-                  <RefreshCw />
-                  Something different
-                </DropdownMenuItem>
+              <DropdownMenuContent align="end" className="w-52">
                 <DropdownMenuItem
                   disabled={action.difficulty === "lighter"}
                   onSelect={() =>
@@ -262,15 +264,15 @@ export function TodayActionCard({
                   }
                 >
                   <ArrowUpToLine />
-                  Make it harder
+                  Make it bigger
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Link href={askHref}>
                     <MessageCircle />
-                    Ask Mentr about this
+                    Ask Mentr about it
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onSelect={() => run("skip", () => skipDailyAction(action.id))}
                 >
@@ -281,26 +283,13 @@ export function TodayActionCard({
             </DropdownMenu>
           </div>
           {showWhy ? (
-            <div className="mt-4 animate-in rounded-xl bg-muted p-4 text-sm duration-200 fade-in">
-              <p className="font-medium">Why this matters</p>
-              <p className="mt-1 text-pretty text-muted-foreground">
-                {action.why}
-              </p>
+            <div className="mt-5 animate-in border-l-2 border-primary/30 pl-4 duration-200 fade-in">
+              <p className="text-pretty">{action.why}</p>
               {milestoneTitle ? (
-                <p className="mt-3 text-xs text-muted-foreground">
-                  Moves forward:{" "}
-                  <span className="font-medium text-foreground">
-                    {milestoneTitle}
-                  </span>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Moves you toward: {milestoneTitle}
                 </p>
               ) : null}
-              <Link
-                href={askHref}
-                className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-primary"
-              >
-                <MessageCircle className="size-3.5" />
-                Ask Mentr more
-              </Link>
             </div>
           ) : null}
         </>
@@ -312,14 +301,14 @@ export function TodayActionCard({
 export function TodayActionSkeleton() {
   return (
     <div
-      className="rounded-2xl border bg-card p-6"
+      className="rounded-[1.75rem] bg-card p-6 sm:p-8"
       aria-busy="true"
-      aria-label="Preparing today’s action"
+      aria-label="Finding your next step"
     >
-      <div className="h-3 w-28 animate-pulse rounded bg-muted" />
-      <div className="mt-4 h-6 w-4/5 animate-pulse rounded bg-muted" />
-      <div className="mt-2 h-4 w-3/5 animate-pulse rounded bg-muted" />
-      <div className="mt-6 h-10 w-32 animate-pulse rounded-full bg-muted" />
+      <div className="h-3.5 w-24 animate-pulse rounded-full bg-muted" />
+      <div className="mt-4 h-7 w-4/5 animate-pulse rounded-full bg-muted" />
+      <div className="mt-3 h-3.5 w-32 animate-pulse rounded-full bg-muted" />
+      <div className="mt-7 h-11 w-28 animate-pulse rounded-full bg-muted" />
     </div>
   );
 }

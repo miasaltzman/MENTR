@@ -24,11 +24,11 @@ export function MemoryList({
     );
   }
   return (
-    <ul className="divide-y rounded-2xl border bg-card">
+    <ul className="divide-y border-y">
       {items.map((m) => (
         <li
           key={m.id}
-          className="flex items-start justify-between gap-3 px-4 py-3 text-sm"
+          className="flex items-start justify-between gap-3 py-3.5 text-sm"
         >
           <span>{m.content}</span>
           <Button

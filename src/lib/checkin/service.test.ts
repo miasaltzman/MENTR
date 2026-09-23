@@ -42,7 +42,7 @@ describe("weekly check-in", () => {
     expect(review.mentor_note).toContain("small");
     expect(review.milestone_updates).toEqual([]);
     expect(review.next_week_priorities[1].title).toBe(
-      "Update your resume with your strongest project",
+      "Improve one resume bullet",
     );
   });
 

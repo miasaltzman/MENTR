@@ -58,7 +58,7 @@ export default async function RoadmapPage() {
   if (!roadmap) {
     return (
       <PageContainer>
-        <h1 className="text-3xl font-semibold">Roadmap</h1>
+        <h1 className="text-display text-5xl">Roadmap</h1>
         <p className="mt-3 text-muted-foreground">
           Your roadmap will appear here once your first plan is ready.
         </p>
@@ -106,7 +106,9 @@ export default async function RoadmapPage() {
             "Your roadmap"
           )}
         </p>
-        <h1 className="mt-2 text-3xl font-semibold">{roadmap.title}</h1>
+        <h1 className="text-display mt-3 text-[2.75rem] sm:text-5xl">
+          {roadmap.title}
+        </h1>
         {roadmap.north_star ? (
           <p className="mt-2 text-pretty text-muted-foreground">
             {roadmap.north_star}
@@ -118,14 +120,14 @@ export default async function RoadmapPage() {
       </header>
 
       {roadmap.mode === "exploring" ? (
-        <p className="mt-6 rounded-xl bg-muted/60 p-4 text-sm text-pretty text-muted-foreground">
+        <p className="mt-6 border-l-2 border-primary/30 pl-4 text-sm text-pretty text-muted-foreground">
           This plan is built for discovery. As you learn what energizes you,
           Mentr will help you turn it into a more specific path — no need to
           decide everything now.
         </p>
       ) : null}
 
-      <ol className="relative mt-10 space-y-10 border-l border-dashed pl-6 sm:pl-8">
+      <ol className="relative mt-12 space-y-12 border-l pl-6 sm:pl-8">
         {PLANNED.map((h) => {
           const items = byHorizon(h);
           const label = horizonLabel(h, isStudent);
@@ -139,7 +141,7 @@ export default async function RoadmapPage() {
                 </span>
               </div>
               {items.length ? (
-                <ul className="space-y-2">
+                <ul className="divide-y border-y">
                   {items.map((m) => (
                     <MilestoneItem key={m.id} milestone={m} />
                   ))}
@@ -191,7 +193,7 @@ export default async function RoadmapPage() {
           <h2 className="mb-3 text-lg font-semibold">Today</h2>
           <Link
             href="/home"
-            className="flex items-center justify-between gap-3 rounded-xl border bg-card p-4 transition-colors hover:border-primary/30"
+            className="group flex items-center justify-between gap-3 border-y py-4"
           >
             <span
               className={cn(
@@ -208,7 +210,7 @@ export default async function RoadmapPage() {
       </ol>
 
       {roadmap.roadmap_revisions.length ? (
-        <section className="mt-12 rounded-2xl border bg-card p-5">
+        <section className="mt-16 border-t pt-6">
           <h2 className="flex items-center gap-2 text-sm font-semibold">
             <History className="size-4 text-muted-foreground" />
             Recent changes

@@ -34,13 +34,13 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
       <main className="flex flex-1 items-start justify-center px-5 pt-10 pb-16 sm:items-center sm:pt-0">
         <div className="w-full max-w-sm">
           <div className="mb-8">
-            <h1 className="text-3xl font-semibold">
+            <h1 className="text-display text-5xl">
               {isSignup ? `Meet ${brand.name}` : "Welcome back"}
             </h1>
             <p className="mt-2 text-muted-foreground">
               {isSignup
-                ? "Create your account, then we’ll have a short conversation about where you are and where you want to go."
-                : `Sign in to pick up where you left off.`}
+                ? "A few quick questions, then your first step."
+                : "Pick up where you left off."}
             </p>
           </div>
           {isSupabaseConfigured() ? (

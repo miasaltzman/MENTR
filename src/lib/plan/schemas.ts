@@ -48,8 +48,12 @@ export const priorityDraft = z.object({
 });
 
 export const actionDraft = z.object({
-  title: z.string().describe("One concrete action, under 100 characters"),
-  description: z.string().describe("How to do it, 1-3 sentences"),
+  title: z
+    .string()
+    .describe(
+      "One concrete quick win, under 80 characters — never a writing assignment",
+    ),
+  description: z.string().describe("One short line on how to start"),
   why: z
     .string()
     .describe("Why this matters for the user's goals, 1-2 sentences"),
@@ -107,8 +111,8 @@ export function sanitizeAction(a: ActionDraft): ActionDraft {
     why: clip(a.why, 500),
     category: a.category,
     estimated_minutes: Math.min(
-      60,
-      Math.max(5, Math.round(a.estimated_minutes || 15)),
+      30,
+      Math.max(2, Math.round(a.estimated_minutes || 5)),
     ),
     difficulty: a.difficulty,
     milestone_ref: a.milestone_ref,

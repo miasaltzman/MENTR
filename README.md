@@ -14,8 +14,8 @@ what to do next — with a personalized roadmap and one small "1%" action every 
 - **Worldwide university search** — ~10k schools from an open dataset, ranked trigram search.
 - **Roadmap** — long term → year → semester/quarter → month → week → today, with milestone status,
   add/remove, and a revision log. Exploration mode when the user doesn't know what they want yet.
-- **The 1% system** — one 5–30 minute action a day: done (with optional note), undo, why this?, something
-  different, easier, harder, skip. Weekly priorities. Progress by category, no guilt streaks.
+- **The 1% system** — one 2–10 minute quick win a day — never homework: done (with optional note), undo, why this?, give me
+  another, easier, bigger, skip. Weekly priorities. Progress by category, no guilt streaks.
 - **Mentor chat** — streaming, persistent context, conversation history, one-tap suggestions
   ("Add to roadmap", "Make this today's 1%"), background memory extraction.
 - **Weekly check-in** — four optional questions; the mentor updates priorities and the roadmap.

@@ -70,15 +70,15 @@ function Chip({
       disabled={disabled}
       aria-pressed={selected}
       className={cn(
-        "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-left text-sm transition-colors",
-        "hover:border-primary/40 hover:bg-accent/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none",
-        "disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 text-left text-sm transition-colors",
+        "focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none",
+        "disabled:pointer-events-none disabled:opacity-40",
         selected
-          ? "border-primary bg-accent text-accent-foreground"
-          : "bg-card",
+          ? "bg-primary text-primary-foreground"
+          : "bg-muted hover:bg-accent hover:text-accent-foreground",
       )}
     >
-      {selected ? <Check className="size-4 shrink-0 text-primary" /> : null}
+      {selected ? <Check className="size-4 shrink-0" /> : null}
       <span>
         {children}
         {hint ? (

@@ -53,9 +53,9 @@ export function CheckinResultView({ result }: { result: CheckinResult }) {
         <h2 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
           Priorities for the week of {week}
         </h2>
-        <ul className="mt-3 divide-y rounded-2xl border bg-card">
+        <ul className="mt-3 divide-y border-y">
           {result.priorities.map((p) => (
-            <li key={p} className="px-4 py-3">
+            <li key={p} className="py-3.5">
               {p}
             </li>
           ))}

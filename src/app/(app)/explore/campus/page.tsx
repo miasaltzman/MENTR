@@ -99,7 +99,7 @@ export default async function CampusPage() {
           href={uni.website_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-between gap-3 rounded-2xl border bg-card p-4 transition-colors hover:border-primary/30"
+          className="group flex items-center justify-between gap-3 border-y py-4"
         >
           <span>
             <span className="block font-medium">Official website</span>
@@ -114,9 +114,9 @@ export default async function CampusPage() {
 
       <Section title="Verified resources">
         {verified.length ? (
-          <ul className="divide-y rounded-2xl border bg-card">
+          <ul className="divide-y border-y">
             {verified.map((r) => (
-              <li key={r.id} className="flex items-start gap-3 p-4">
+              <li key={r.id} className="flex items-start gap-3 py-4">
                 <ShieldCheck className="mt-0.5 size-4 shrink-0 text-success" />
                 <div className="min-w-0 flex-1">
                   <a
@@ -151,7 +151,7 @@ export default async function CampusPage() {
             ))}
           </ul>
         ) : (
-          <p className="rounded-2xl border border-dashed p-4 text-sm text-pretty text-muted-foreground">
+          <p className="border-l-2 pl-4 text-sm text-pretty text-muted-foreground">
             We haven’t verified specific resources for {uni.name} yet. Rather
             than guess at links, we show searches of the school’s own website
             below so you can find the official pages.
@@ -161,9 +161,9 @@ export default async function CampusPage() {
 
       {unverified.length ? (
         <Section title="Found, not yet verified">
-          <ul className="divide-y rounded-2xl border bg-card">
+          <ul className="divide-y border-y">
             {unverified.map((r) => (
-              <li key={r.id} className="flex items-start gap-3 p-4">
+              <li key={r.id} className="flex items-start gap-3 py-4">
                 <ShieldQuestion className="mt-0.5 size-4 shrink-0 text-warning" />
                 <div className="min-w-0 flex-1">
                   <a
@@ -199,7 +199,7 @@ export default async function CampusPage() {
                     href={siteSearchUrl(domain, t.query)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex h-full items-start gap-3 rounded-xl border bg-card p-3.5 transition-colors hover:border-primary/30"
+                    className="flex h-full items-start gap-3 rounded-2xl bg-muted/60 p-4 transition-colors hover:bg-muted"
                   >
                     <Search className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
                     <span>

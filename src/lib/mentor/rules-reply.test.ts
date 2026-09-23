@@ -81,7 +81,7 @@ describe("sanitizeSuggestions", () => {
     expect(out[0]).toMatchObject({
       title: "Do it",
       horizon: null,
-      estimated_minutes: 60,
+      estimated_minutes: 30,
     });
     expect(out[1]).toMatchObject({ horizon: "month", estimated_minutes: null });
   });

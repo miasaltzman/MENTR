@@ -25,7 +25,7 @@ export function WeeklyPriorities({ priorities }: { priorities: Priority[] }) {
   if (!items.length) {
     return (
       <p className="text-sm text-muted-foreground">
-        No priorities yet this week.
+        Nothing planned for this week yet.
       </p>
     );
   }
@@ -33,7 +33,7 @@ export function WeeklyPriorities({ priorities }: { priorities: Priority[] }) {
   const done = items.filter((p) => p.status === "done").length;
   return (
     <div>
-      <ul className="divide-y rounded-2xl border bg-card">
+      <ul className="divide-y border-y">
         {items.map((p) => {
           const checked = p.status === "done";
           return (
@@ -49,7 +49,7 @@ export function WeeklyPriorities({ priorities }: { priorities: Priority[] }) {
                     if (!r.ok) toast.error(r.error);
                   })
                 }
-                className="flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors hover:bg-muted/40"
+                className="group flex w-full items-start gap-3.5 py-4 text-left"
               >
                 <span
                   className={cn(
@@ -69,18 +69,13 @@ export function WeeklyPriorities({ priorities }: { priorities: Priority[] }) {
                   >
                     {p.title}
                   </span>
-                  {p.why && !checked ? (
-                    <span className="mt-0.5 line-clamp-2 block text-sm text-muted-foreground">
-                      {p.why}
-                    </span>
-                  ) : null}
                 </span>
               </button>
             </li>
           );
         })}
       </ul>
-      <p className="mt-2 text-xs text-muted-foreground">
+      <p className="mt-3 text-sm text-muted-foreground">
         {done} of {items.length} done this week
       </p>
     </div>

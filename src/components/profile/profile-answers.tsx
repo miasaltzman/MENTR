@@ -41,7 +41,7 @@ export function ProfileAnswers({
   return (
     <div>
       {changed ? (
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary/25 bg-accent/50 p-4">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-accent p-4 text-accent-foreground">
           <p className="text-sm">
             Your answers changed. Want Mentr to rebuild your roadmap around
             them?
@@ -65,13 +65,13 @@ export function ProfileAnswers({
           </Button>
         </div>
       ) : null}
-      <ul className="divide-y rounded-2xl border bg-card">
+      <ul className="divide-y border-y">
         {steps.map((step) => {
           const answer = answers[step.key];
           const isEditing = editing === step.key;
           const empty = !answer || isSkipped(answer);
           return (
-            <li key={step.key} className="px-4 py-3.5">
+            <li key={step.key} className="py-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-xs text-muted-foreground">
