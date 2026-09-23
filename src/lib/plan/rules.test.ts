@@ -191,3 +191,30 @@ describe("sanitizePlan", () => {
     expect(clean.today.estimated_minutes).toBe(60);
   });
 });
+
+describe("resizeRulesAction", () => {
+  it("keeps the same idea when making an action easier or harder", async () => {
+    const { resizeRulesAction } = await import("./rules");
+    const original = rulesDailyAction(demoStudent, {
+      milestones: [],
+      seed: "z",
+    });
+    const easier = resizeRulesAction(
+      demoStudent,
+      { title: original.title, milestone_ref: "m-1" },
+      "lighter",
+    );
+    expect(easier).not.toBeNull();
+    expect(easier!.why).toBe(original.why);
+    expect(easier!.category).toBe(original.category);
+    expect(easier!.estimated_minutes).toBeLessThan(original.estimated_minutes);
+    expect(easier!.milestone_ref).toBe("m-1");
+    expect(
+      resizeRulesAction(
+        demoStudent,
+        { title: "Unknown", milestone_ref: null },
+        "lighter",
+      ),
+    ).toBeNull();
+  });
+});

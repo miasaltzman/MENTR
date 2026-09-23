@@ -1281,3 +1281,30 @@ export function rulesDailyAction(
     milestone_ref: milestone?.ref ?? null,
   };
 }
+
+/**
+ * Resizes an existing rules-based action (same idea, different size).
+ * Returns null when the action didn't come from a known template.
+ */
+export function resizeRulesAction(
+  ctx: MentorContext,
+  current: { title: string; milestone_ref: string | null },
+  difficulty: Difficulty,
+): ActionDraft | null {
+  for (const t of TEMPLATES) {
+    const built = t.build(ctx);
+    const levels = [built.lighter, built.standard, built.stretch];
+    if (!levels.some((l) => l.title === current.title)) continue;
+    const level = built[difficulty];
+    return {
+      title: level.title,
+      description: level.description,
+      why: built.why,
+      category: t.category,
+      estimated_minutes: level.minutes,
+      difficulty,
+      milestone_ref: current.milestone_ref,
+    };
+  }
+  return null;
+}

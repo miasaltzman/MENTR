@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   completeAction,
   replaceAction,
+  saveReflection,
   skipAction,
   undoCompleteAction,
 } from "./service";
@@ -92,4 +93,16 @@ export async function setPriorityStatus(
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
   });
+}
+
+export async function saveActionReflection(
+  actionId: string,
+  reflection: string,
+): Promise<ActionResult> {
+  const parsed = id.safeParse(actionId);
+  if (!parsed.success || typeof reflection !== "string")
+    return { ok: false, error: "Invalid request." };
+  return run("reflection", async (userId) =>
+    saveReflection(await createClient(), userId, parsed.data, reflection),
+  );
 }

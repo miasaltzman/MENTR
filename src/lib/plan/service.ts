@@ -12,6 +12,7 @@ import { weekStart } from "@/lib/domain/dates";
 import type { ServerSupabase } from "@/lib/supabase/server";
 import type { Tables } from "@/types/database";
 import {
+  resizeRulesAction,
   rulesDailyAction,
   rulesInitialPlan,
   rulesWeeklyPriorities,
@@ -212,7 +213,11 @@ async function draftDailyAction(
   ctx: MentorContext,
   opts: {
     difficulty: Difficulty;
-    replacing?: { title: string; reason: "different" | "lighter" | "stretch" };
+    replacing?: {
+      title: string;
+      reason: "different" | "lighter" | "stretch";
+      milestoneId?: string | null;
+    };
     avoidTitles: string[];
   },
 ) {
@@ -232,6 +237,16 @@ async function draftDailyAction(
     prompt: dailyActionPrompt(ctx, opts),
     schema: actionDraft,
     fallback: () =>
+      (opts.replacing && opts.replacing.reason !== "different"
+        ? resizeRulesAction(
+            ctx,
+            {
+              title: opts.replacing.title,
+              milestone_ref: opts.replacing.milestoneId ?? null,
+            },
+            opts.difficulty,
+          )
+        : null) ??
       rulesDailyAction(ctx, {
         milestones: open.map((m) => ({ ref: m.id, category: m.category })),
         avoidTitles:
@@ -406,7 +421,11 @@ export async function replaceAction(
     },
     {
       difficulty,
-      replacing: { title: current.title, reason: mode },
+      replacing: {
+        title: current.title,
+        reason: mode,
+        milestoneId: current.milestone_id,
+      },
       avoidTitles,
     },
   );
@@ -499,4 +518,18 @@ export async function ensureWeeklyPriorities(
     .eq("week_start", week)
     .order("position");
   return reloaded.data ?? [];
+}
+
+export async function saveReflection(
+  supabase: Db,
+  userId: string,
+  actionId: string,
+  reflection: string,
+) {
+  const { error } = await supabase
+    .from("action_completions")
+    .update({ reflection: reflection.trim().slice(0, 1000) || null })
+    .eq("action_id", actionId)
+    .eq("user_id", userId);
+  if (error) fail("save reflection", error);
 }

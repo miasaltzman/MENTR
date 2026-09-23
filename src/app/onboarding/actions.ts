@@ -103,8 +103,14 @@ export async function completeOnboarding(): Promise<SaveResult> {
   try {
     await generateInitialPlan(supabase, user.id);
   } catch (err) {
-    console.error("[onboarding] plan generation failed", err instanceof Error ? err.message : err);
-    return { ok: false, error: "We couldn’t build your plan just now. Please try again." };
+    console.error(
+      "[onboarding] plan generation failed",
+      err instanceof Error ? err.message : err,
+    );
+    return {
+      ok: false,
+      error: "We couldn’t build your plan just now. Please try again.",
+    };
   }
 
   const { error } = await supabase
