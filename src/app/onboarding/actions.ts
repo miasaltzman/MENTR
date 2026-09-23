@@ -10,6 +10,7 @@ import {
   parseAnswer,
 } from "@/lib/onboarding/flow";
 import { persistAnswer } from "@/lib/onboarding/persist";
+import { generateInitialPlan } from "@/lib/plan/service";
 import { createClient } from "@/lib/supabase/server";
 
 export type SaveResult = { ok: true } | { ok: false; error: string };
@@ -98,6 +99,13 @@ export async function completeOnboarding(): Promise<SaveResult> {
   const missing = missingCoreSteps(answers);
   if (missing.length)
     return { ok: false, error: "A few questions still need an answer." };
+
+  try {
+    await generateInitialPlan(supabase, user.id);
+  } catch (err) {
+    console.error("[onboarding] plan generation failed", err instanceof Error ? err.message : err);
+    return { ok: false, error: "We couldn’t build your plan just now. Please try again." };
+  }
 
   const { error } = await supabase
     .from("profiles")
