@@ -54,7 +54,9 @@ select pg_temp.assert(
 insert into public.universities (id, name, search_name, domains, primary_domain, country, country_code, source, source_id) values
   ('10000000-0000-0000-0000-000000000001', 'San Diego State University', 'san diego state university', '{sdsu.edu}', 'sdsu.edu', 'United States', 'US', 'test', '1'),
   ('10000000-0000-0000-0000-000000000002', 'University of San Diego', 'university of san diego', '{sandiego.edu}', 'sandiego.edu', 'United States', 'US', 'test', '2'),
-  ('10000000-0000-0000-0000-000000000003', 'Universidad de Buenos Aires', 'universidad de buenos aires', '{uba.ar}', 'uba.ar', 'Argentina', 'AR', 'test', '3');
+  ('10000000-0000-0000-0000-000000000003', 'Universidad de Buenos Aires', 'universidad de buenos aires', '{uba.ar}', 'uba.ar', 'Argentina', 'AR', 'test', '3'),
+  ('10000000-0000-0000-0000-000000000004', 'Massachusetts Institute of Technology', 'massachusetts institute of technology', '{mit.edu}', 'mit.edu', 'United States', 'US', 'test', '4'),
+  ('10000000-0000-0000-0000-000000000005', 'Mitchell College', 'mitchell college', '{mitchell.edu}', 'mitchell.edu', 'United States', 'US', 'test', '5');
 
 -- ---------------------------------------------------------------------------
 -- User A creates data
@@ -105,7 +107,7 @@ select pg_temp.expect_error($sql$
 $sql$, '23505', 'only one active career roadmap');
 
 -- Catalogs are read-only for users
-select pg_temp.assert((select count(*) from public.universities) = 3, 'authenticated can read universities');
+select pg_temp.assert((select count(*) from public.universities) = 5, 'authenticated can read universities');
 select pg_temp.expect_error($sql$
   insert into public.universities (name, search_name, source) values ('Fake U', 'fake u', 'user')
 $sql$, '42501', 'authenticated cannot write universities');
@@ -116,6 +118,9 @@ select pg_temp.assert(
   'search ranks exact prefix first');
 select pg_temp.assert(
   (select count(*) from public.search_universities('sdsu')) >= 1, 'search matches domains');
+select pg_temp.assert(
+  (select name from public.search_universities('mit') limit 1) = 'Massachusetts Institute of Technology',
+  'exact domain label ranks first');
 select pg_temp.assert(
   (select count(*) from public.search_universities('diego', 'AR')) = 0, 'search filters by country');
 select pg_temp.assert(
