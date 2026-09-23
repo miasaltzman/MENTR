@@ -23,6 +23,27 @@ npm run dev
 
 Without `ANTHROPIC_API_KEY`, set `AI_PROVIDER=mock` to use the deterministic mock mentor.
 
+## Supabase setup
+
+1. Create a project and apply migrations: `supabase link` then `supabase db push`
+   (or paste `supabase/migrations/*.sql` in order into the SQL editor).
+2. **Auth → URL configuration**: add `http://localhost:3000/**` and your
+   production URL to the redirect allow-list.
+3. **Auth → Email templates → Magic link**: include both the link and the code so
+   users can sign in on any device:
+
+   ```html
+   <p>
+     <a
+       href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email"
+       >Sign in to Mentr</a
+     >
+   </p>
+   <p>Or enter this code: <strong>{{ .Token }}</strong></p>
+   ```
+
+4. **Auth → Providers → Google**: enable and add your OAuth client ID/secret.
+
 ## Scripts
 
 | Script              | Purpose                                                      |
