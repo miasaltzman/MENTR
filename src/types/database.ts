@@ -1481,6 +1481,7 @@ export type Database = {
           five_year_vision: string | null;
           created_at: string;
           updated_at: string;
+          interests: string[];
         };
         Insert: {
           user_id: string;
@@ -1496,6 +1497,7 @@ export type Database = {
           five_year_vision?: string | null;
           created_at?: string;
           updated_at?: string;
+          interests?: string[];
         };
         Update: {
           user_id?: string;
@@ -1511,6 +1513,7 @@ export type Database = {
           five_year_vision?: string | null;
           created_at?: string;
           updated_at?: string;
+          interests?: string[];
         };
         Relationships: [
           {
